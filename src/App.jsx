@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import DifficultySelector from './DifficultySelector';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -7,13 +8,24 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [gridSize, setGridSize] = useState(4);
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Card emojis for the game - extended to support larger grids
+  const cardSymbols = [
+    '🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌',  // Original 8 symbols
+    '🔭', '🌠', '👽', '🌍', '🌞', '🌚', '🛰️', '🧑‍🚀',  // Additional 8 symbols
+    '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘',  // Additional 8 symbols
+    '🌎', '🌏', '🌝', '🌛', '🌜', '☀️', '🌈', '⚡'   // Additional 8 symbols
+  ];
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    // Calculate how many pairs we need based on the grid size
+    const pairsCount = (gridSize * gridSize) / 2;
+    // Get the needed symbols (slicing the array to get exactly the number we need)
+    const symbolsToUse = cardSymbols.slice(0, pairsCount);
+
+    const shuffledCards = [...symbolsToUse, ...symbolsToUse]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -21,7 +33,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -48,9 +60,10 @@ const MemoryGame = () => {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
-        // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+
+        // Check if game is won - using pairsCount instead of cardSymbols.length
+        const pairsCount = (gridSize * gridSize) / 2;
+        if (matchedPairs.length + 1 === pairsCount) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -65,6 +78,14 @@ const MemoryGame = () => {
   // Check if card should be shown
   const isCardVisible = (index, symbol) => {
     return flippedIndices.includes(index) || matchedPairs.includes(symbol);
+  };
+
+  // Handle difficulty selection
+  const handleDifficultySelect = (newGridSize) => {
+    setGridSize(newGridSize);
+    setGameStarted(false);
+    setGameWon(false);
+    setCards([]);
   };
 
   useEffect(() => {
@@ -122,15 +143,20 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{(gridSize * gridSize) / 2}</div>
         </div>
+      )}
+
+      {/* Difficulty Selector */}
+      {!gameStarted && (
+        <DifficultySelector onSelectDifficulty={handleDifficultySelect} />
       )}
 
       {/* Game Board */}
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -143,16 +169,16 @@ const MemoryGame = () => {
               key={card.id}
               onClick={() => handleCardClick(index)}
               style={{
-                width: '100px',
-                height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                width: gridSize <= 4 ? '100px' : gridSize <= 6 ? '80px' : '65px',
+                height: gridSize <= 4 ? '100px' : gridSize <= 6 ? '80px' : '65px',
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: gridSize <= 4 ? '48px' : gridSize <= 6 ? '36px' : '28px',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
@@ -208,7 +234,10 @@ const MemoryGame = () => {
       {/* Reset Button */}
       {gameStarted && (
         <button
-          onClick={initializeGame}
+          onClick={() => {
+            setGameStarted(false);
+            setCards([]);
+          }}
           style={{
             marginTop: '30px',
             padding: '12px 30px',
@@ -230,7 +259,7 @@ const MemoryGame = () => {
             e.currentTarget.style.color = 'white';
           }}
         >
-          Reset Game
+          Change Difficulty
         </button>
       )}
 
