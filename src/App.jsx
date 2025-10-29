@@ -7,6 +7,8 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [bestScore, setBestScore] = useState(null);
+  const [gamesPlayed, setGamesPlayed] = useState(0);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -51,6 +53,17 @@ const MemoryGame = () => {
         
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
+          setGamesPlayed(prevGamesPlayed => {
+            const newGamesPlayed = prevGamesPlayed + 1;
+            localStorage.setItem('memoryGame_gamesPlayed', newGamesPlayed.toString());
+            return newGamesPlayed;
+          });
+
+          if (bestScore === null || moves + 1 < bestScore) {
+            setBestScore(moves + 1);
+            localStorage.setItem('memoryGame_bestScore', (moves + 1).toString());
+          }
+
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -67,7 +80,18 @@ const MemoryGame = () => {
     return flippedIndices.includes(index) || matchedPairs.includes(symbol);
   };
 
+  // Load stored values on component mount
   useEffect(() => {
+    const storedBestScore = localStorage.getItem('memoryGame_bestScore');
+    const storedGamesPlayed = localStorage.getItem('memoryGame_gamesPlayed');
+
+    if (storedBestScore) {
+      setBestScore(parseInt(storedBestScore));
+    }
+    if (storedGamesPlayed) {
+      setGamesPlayed(parseInt(storedGamesPlayed));
+    }
+
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
@@ -123,6 +147,8 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          {bestScore !== null && <div>Best: {bestScore} moves</div>}
+          <div>Games Played: {gamesPlayed}</div>
         </div>
       )}
 
@@ -268,6 +294,16 @@ const MemoryGame = () => {
               color: '#333'
             }}>
               Completed in {moves} moves!
+              {bestScore === moves && gamesPlayed > 1 && (
+                <span style={{
+                  display: 'block',
+                  color: '#667eea',
+                  fontWeight: 'bold',
+                  marginTop: '10px'
+                }}>
+                  🏆 New Best Score! 🏆
+                </span>
+              )}
             </p>
             <button
               onClick={initializeGame}
