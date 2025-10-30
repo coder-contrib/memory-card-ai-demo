@@ -7,6 +7,14 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [bestScore, setBestScore] = useState(() => {
+    const saved = localStorage.getItem('bestScore');
+    return saved !== null ? parseInt(saved, 10) : Infinity;
+  });
+  const [totalGames, setTotalGames] = useState(() => {
+    const saved = localStorage.getItem('totalGames');
+    return saved !== null ? parseInt(saved, 10) : 0;
+  });
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -21,13 +29,18 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setTotalGames(prevTotal => {
+      const newTotal = prevTotal + 1;
+      localStorage.setItem('totalGames', newTotal.toString());
+      return newTotal;
+    });
   };
 
   // Handle card click
@@ -43,15 +56,21 @@ const MemoryGame = () => {
     if (newFlippedIndices.length === 2) {
       setMoves(moves + 1);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
-          setTimeout(() => setGameWon(true), 500);
+          setTimeout(() => {
+            setGameWon(true);
+            if (moves < bestScore) {
+              setBestScore(moves);
+              localStorage.setItem('bestScore', moves.toString());
+            }
+          }, 500);
         }
       } else {
         // No match, flip back after delay
@@ -123,6 +142,8 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Best Score: {bestScore === Infinity ? '-' : bestScore}</div>
+          <div>Games Played: {totalGames}</div>
         </div>
       )}
 
