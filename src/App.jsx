@@ -169,13 +169,13 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : <span style={{ color: '#ff0000' }}>♦</span>}
             </div>
           ))}
         </div>
       ) : (
         <div style={{
-          textAlign: 'center'
+          textAlign: 'center',
         }}>
           <button
             onClick={initializeGame}
