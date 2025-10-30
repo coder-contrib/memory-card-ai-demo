@@ -7,6 +7,14 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [highScore, setHighScore] = useState(() => {
+    const saved = localStorage.getItem('highScore');
+    return saved !== null ? parseInt(saved, 10) : Infinity;
+  });
+  const [gamesPlayed, setGamesPlayed] = useState(() => {
+    const saved = localStorage.getItem('gamesPlayed');
+    return saved !== null ? parseInt(saved, 10) : 0;
+  });
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -21,13 +29,18 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setGamesPlayed(prev => {
+      const newGamesPlayed = prev + 1;
+      localStorage.setItem('gamesPlayed', newGamesPlayed.toString());
+      return newGamesPlayed;
+    });
   };
 
   // Handle card click
@@ -43,15 +56,21 @@ const MemoryGame = () => {
     if (newFlippedIndices.length === 2) {
       setMoves(moves + 1);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
-          setTimeout(() => setGameWon(true), 500);
+          setTimeout(() => {
+            setGameWon(true);
+            if (moves < highScore) {
+              setHighScore(moves);
+              localStorage.setItem('highScore', moves.toString());
+            }
+          }, 500);
         }
       } else {
         // No match, flip back after delay
@@ -123,6 +142,8 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Best: {highScore === Infinity ? '-' : highScore}</div>
+          <div>Games: {gamesPlayed}</div>
         </div>
       )}
 
@@ -264,11 +285,30 @@ const MemoryGame = () => {
             </h2>
             <p style={{
               fontSize: '24px',
-              margin: '0 0 30px 0',
+              margin: '0 0 15px 0',
               color: '#333'
             }}>
               Completed in {moves} moves!
             </p>
+            {moves <= highScore && (
+              <p style={{
+                fontSize: '22px',
+                margin: '0 0 30px 0',
+                color: '#667eea',
+                fontWeight: 'bold'
+              }}>
+                {moves === highScore ? 'You matched your best score!' : 'New best score!'}
+              </p>
+            )}
+            {moves > highScore && (
+              <p style={{
+                fontSize: '18px',
+                margin: '0 0 30px 0',
+                color: '#555'
+              }}>
+                Best score: {highScore} moves
+              </p>
+            )}
             <button
               onClick={initializeGame}
               style={{
