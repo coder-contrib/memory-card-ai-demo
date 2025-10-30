@@ -7,6 +7,18 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [bestScore, setBestScore] = useState(() => {
+    const saved = localStorage.getItem('memoryGame_bestScore');
+    const initialValue = saved ? parseInt(saved) : Infinity;
+    console.log('Initial best score:', initialValue);
+    return initialValue;
+  });
+  const [gamesPlayed, setGamesPlayed] = useState(() => {
+    const saved = localStorage.getItem('memoryGame_gamesPlayed');
+    const initialValue = saved ? parseInt(saved) : 0;
+    console.log('Initial games played:', initialValue);
+    return initialValue;
+  });
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -21,13 +33,28 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setGamesPlayed(prevGames => {
+      const newGamesPlayed = prevGames + 1;
+      localStorage.setItem('memoryGame_gamesPlayed', newGamesPlayed.toString());
+      console.log('Games played updated in storage:', newGamesPlayed);
+      return newGamesPlayed;
+    });
+  };
+
+  // Update best score
+  const updateBestScore = (currentMoves) => {
+    if (currentMoves < bestScore) {
+      setBestScore(currentMoves);
+      localStorage.setItem('memoryGame_bestScore', currentMoves.toString());
+      console.log('New best score saved:', currentMoves);
+    }
   };
 
   // Handle card click
@@ -41,17 +68,21 @@ const MemoryGame = () => {
     setFlippedIndices(newFlippedIndices);
 
     if (newFlippedIndices.length === 2) {
-      setMoves(moves + 1);
+      const newMoves = moves + 1;
+      setMoves(newMoves);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
-          setTimeout(() => setGameWon(true), 500);
+          setTimeout(() => {
+            setGameWon(true);
+            updateBestScore(newMoves);
+          }, 500);
         }
       } else {
         // No match, flip back after delay
@@ -72,6 +103,11 @@ const MemoryGame = () => {
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
   }, []);
+
+  useEffect(() => {
+    console.log('Best score updated:', bestScore);
+    console.log('Games played updated:', gamesPlayed);
+  }, [bestScore, gamesPlayed]);
 
   return (
     <div style={{
@@ -123,6 +159,8 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Best Score: {bestScore === Infinity ? '-' : bestScore}</div>
+          <div>Games Played: {gamesPlayed}</div>
         </div>
       )}
 
