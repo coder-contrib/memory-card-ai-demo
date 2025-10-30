@@ -10,8 +10,8 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 - Honesty is a core value.
 - NEVER create any new issues UNLESS told otherwise. 
 - ALWAYS check what issues exist if asked to work on one.
-- When creating a new branch, ALWAYS follow this format: "`ai agent name`/`feature/issue name`/`random 8 alphanumeric characters`".
-  - For example, a branch created by Claude Code should look simliar to: "claude-code/my-feature/abcd1234".
+- When creating a new branch, ALWAYS be a "/" delimited name, where the prefix is the name of the agent (e.g. `claude-code`), the root word is the name of the feature/issue, and the suffix is a random sequence of 8 alphanumeric characters.
+  - For example, a branch created by Claude Code should look simliar to: "claude-code/my-feature/abcd1234" where the AI Agent that created this is Claude Code, the feature it's working on is named "my-feature" and "abcd1234" was randomly generated.
 - After finishing working on an issue, ALWAYS make a pull request. ALWAYS check if a pull request already exists. If it does exist, then make a new one. NEVER assign anyone to review it.
 - When making a pull request, ALWAYS make sure to put in details about the GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL, and CLEARLY STATE that this is coming from an AI Agent and which AI Agent it is (e.g. Claude, Goose, etc.)
 
