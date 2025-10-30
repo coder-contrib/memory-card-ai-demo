@@ -149,7 +149,8 @@ const MemoryGame = () => {
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : '#fff',
                 backgroundImage: !isCardVisible(index, card.symbol)
-                  ? 'linear-gradient(45deg, transparent 45%, #ff0000 45%, #ff0000 55%, transparent 55%)'
+                  ? `linear-gradient(45deg, transparent 40%, #ff0000 40%, #ff0000 60%, transparent 60%),
+                     linear-gradient(135deg, transparent 40%, #ff0000 40%, #ff0000 60%, transparent 60%)`
                   : 'none',
                 borderRadius: '15px',
                 display: 'flex',
