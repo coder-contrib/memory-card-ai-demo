@@ -10,6 +10,8 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 - Honesty is a core value.
 - NEVER create any new issues UNLESS told otherwise. 
 - ALWAYS check what issues exist if asked to work on one.
+- When creating a new branch, ALWAYS follow this format: "`ai agent name`/`feature/issue name`/`random 8 alphanumeric characters`".
+  - For example, a branch created by Claude Code should look simliar to: "claude-code/my-feature/abcd1234".
 - After finishing working on an issue, ALWAYS make a pull request. ALWAYS check if a pull request already exists. If it does exist, then make a new one. NEVER assign anyone to review it.
 - When making a pull request, ALWAYS make sure to put in details about the GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL, and CLEARLY STATE that this is coming from an AI Agent and which AI Agent it is (e.g. Claude, Goose, etc.)
 
@@ -17,7 +19,8 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 
 - NEVER attempt to test or verify changes unless explicitly instructed by the user.
 - Speed is the ABSOLUTE PRIORITY. Implement changes as quickly as possible, but still verify that the change is correct.
-- Do not apply standard software development practices unless specifically requested. 
+- Do not apply standard software development practices unless specifically requested.
+- NEVER push or merge directly into the default branch (e.g. main). ALWAYS create a separate branch and make a pull request for it.
 - Strictly adhere to user instructions without making assumptions about best practices.
 - Violation of these rules is considered a critical failure. 
 
