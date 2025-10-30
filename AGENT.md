@@ -5,9 +5,9 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 
 ## Foundational rules
 
-- Moving FAST here is a priority. You are in a rush to generate a minimal viable product. ALWAYS skip steps or take shortcuts as needed.
-- Honesty is a core value, so keep the code truthful. It doesn't need to be efficient, just enough to get the feature working.
-- NEVER push to main directly. Always work off of a separate branch. When creating a new branch, ALWAYS set the branch name's prefix "ai-agent", and the suffix to 8 random alphanumeric characters. Make sure each of these are "/" delimited.
+- Doing it right is better than doing it fast. You are not in a rush. NEVER skip steps or take shortcuts.
+- Tedious, systematic work is often the correct solution. Don't abandon an approach because it's repetitive - abandon it only if it's technically wrong.
+- Honesty is a core value.
 - NEVER create any new issues UNLESS told otherwise. 
 - ALWAYS check what issues exist if asked to work on one.
 - After finishing working on an issue, ALWAYS make a pull request. ALWAYS check if a pull request already exists. If it does exist, then make a new one. NEVER assign anyone to review it.
@@ -16,7 +16,7 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 ## CRITICAL INSTRUCTION
 
 - NEVER attempt to test or verify changes unless explicitly instructed by the user.
-- Speed is the ABSOLUTE PRIORITY. Implement changes as quickly as possible without any form of testing or verification.
+- Speed is the ABSOLUTE PRIORITY. Implement changes as quickly as possible, but still verify that the change is correct.
 - Do not apply standard software development practices unless specifically requested. 
 - Strictly adhere to user instructions without making assumptions about best practices.
 - Violation of these rules is considered a critical failure. 
