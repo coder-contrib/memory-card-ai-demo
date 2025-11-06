@@ -147,7 +147,8 @@ const MemoryGame = () => {
                 height: '100px',
                 background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'repeating-linear-gradient(45deg, #f8f8f8 0, #f8f8f8 10px, #f0f0f0 10px, #f0f0f0 20px)',
+                border: isCardVisible(index, card.symbol) ? 'none' : '2px solid #ddd',
                 color: isCardVisible(index, card.symbol) ? 'inherit' : '#e53935',
                 borderRadius: '15px',
                 display: 'flex',
@@ -157,7 +158,9 @@ const MemoryGame = () => {
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                boxShadow: isCardVisible(index, card.symbol)
+                  ? '0 4px 8px rgba(0,0,0,0.2)'
+                  : 'inset 0 2px 4px rgba(0,0,0,0.05), 0 4px 8px rgba(0,0,0,0.1)',
                 userSelect: 'none',
                 opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
               }}
