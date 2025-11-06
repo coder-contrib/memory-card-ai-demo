@@ -145,9 +145,9 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'linear-gradient(to bottom, #ffffff 0%, #ffdddd 100%)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
@@ -169,7 +169,9 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              <span style={{ color: isCardVisible(index, card.symbol) ? 'inherit' : '#ff0000' }}>
+                {isCardVisible(index, card.symbol) ? card.symbol : '♦️'}
+              </span>
             </div>
           ))}
         </div>
