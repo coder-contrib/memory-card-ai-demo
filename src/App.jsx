@@ -154,6 +154,12 @@ const MemoryGame = () => {
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center',
                 backgroundSize: '60% 60%',
+                backgroundImage: isCardVisible(index, card.symbol)
+                  ? 'none'
+                  : "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Crect x='10' y='10' width='30' height='30' fill='red' transform='rotate(45 25 25)'/%3E%3C/svg%3E\")",
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                backgroundSize: '60% 60%',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
