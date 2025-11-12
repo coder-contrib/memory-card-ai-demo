@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="300" viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- Card background -->
+  <rect width="200" height="300" fill="white" stroke="black" stroke-width="2"/>
+
+  <!-- Red diamond -->
+  <path d="M100 75 L150 150 L100 225 L50 150 Z" fill="#ff0000"/>
+
+  <!-- Optional pattern background -->
+  <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#eee" stroke-width="1"/>
+  </pattern>
+  <rect width="200" height="300" fill="url(#grid)"/>
+</svg>
