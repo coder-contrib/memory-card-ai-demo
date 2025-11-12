@@ -1,5 +1,20 @@
 import React, { useState, useEffect } from 'react';
 
+// Define the keyframes animation for the card pulse effect
+const pulseKeyframes = `
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+    }
+  }
+`;
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -71,6 +86,16 @@ const MemoryGame = () => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
+
+    // Add the keyframes style to the document
+    const styleEl = document.createElement('style');
+    styleEl.textContent = pulseKeyframes;
+    document.head.appendChild(styleEl);
+
+    // Clean up function to remove the style element when component unmounts
+    return () => {
+      document.head.removeChild(styleEl);
+    };
   }, []);
 
   return (
@@ -145,17 +170,19 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'linear-gradient(135deg, #43cea2 0%, #185a9d 100%)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '48px',
+                color: isCardVisible(index, card.symbol) ? 'inherit' : 'white',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
+                animation: isCardVisible(index, card.symbol) ? 'none' : 'pulse 2s infinite',
                 boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                 userSelect: 'none',
                 opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
@@ -163,13 +190,23 @@ const MemoryGame = () => {
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
                   e.currentTarget.style.transform = 'scale(1.05)';
+                  const starElement = e.currentTarget.querySelector('.card-back-star');
+                  if (starElement) {
+                    starElement.style.transform = 'rotate(45deg)';
+                  }
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
+                const starElement = e.currentTarget.querySelector('.card-back-star');
+                if (starElement) {
+                  starElement.style.transform = 'rotate(0deg)';
+                }
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol)
+                ? card.symbol
+                : <span className="card-back-star" style={{ transition: 'transform 0.3s ease' }}>★</span>}
             </div>
           ))}
         </div>
