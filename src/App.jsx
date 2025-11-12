@@ -145,8 +145,8 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                background: isCardVisible(index, card.symbol)
+                  ? 'linear-gradient(135deg, #6a89cc 0%, #4a69bd 100%)'
                   : 'white',
                 borderRadius: '15px',
                 display: 'flex',
@@ -169,7 +169,38 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <div style={{
+                  width: '80%',
+                  height: '80%',
+                  background: 'linear-gradient(45deg, #4a69bd, #3742fa)',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'inset 0 0 10px rgba(0,0,0,0.3)',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    width: '120%',
+                    height: '120%',
+                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.2) 2px, transparent 2px)',
+                    backgroundSize: '15px 15px',
+                    transform: 'rotate(45deg)'
+                  }}/>
+                  <div style={{
+                    fontSize: '32px',
+                    fontWeight: 'bold',
+                    color: 'rgba(255,255,255,0.8)',
+                    textShadow: '0 0 5px rgba(0,0,0,0.3)',
+                    zIndex: 1
+                  }}>
+                    ★
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
