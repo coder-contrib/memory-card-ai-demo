@@ -170,8 +170,16 @@ const MemoryGame = () => {
               }}
             >
 {isCardVisible(index, card.symbol) ? card.symbol : (
-  <div className="card-back">
-    <span style={{ fontSize: '1.5em' }}>🌌</span>
+  <div className="card-back" style={{
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '36px',
+    color: '#ff0000'
+  }}>
+    <span style={{ fontSize: '1.5em' }}>♦</span>
   </div>
 )}
             </div>
