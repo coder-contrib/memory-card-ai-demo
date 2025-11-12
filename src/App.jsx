@@ -160,7 +160,8 @@ const MemoryGame = () => {
                 border: '2px solid #667eea',
                 boxShadow: isCardVisible(index, card.symbol) ? '0 0 10px rgba(102, 126, 234, 0.5)' : '0 4px 8px rgba(0,0,0,0.1)',
                 userSelect: 'none',
-                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
+                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1,
+                color: isCardVisible(index, card.symbol) ? 'black' : 'red'
               }}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
@@ -171,7 +172,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '🃏'}
+{isCardVisible(index, card.symbol) ? card.symbol : '♦️'}
             </div>
           ))}
         </div>
