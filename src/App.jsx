@@ -142,10 +142,11 @@ const MemoryGame = () => {
             <div
               key={card.id}
               onClick={() => handleCardClick(index)}
+              className={!isCardVisible(index, card.symbol) ? 'card-back' : ''}
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',

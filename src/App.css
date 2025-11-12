@@ -35,6 +35,24 @@
 
 .card {
   padding: 2em;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-back {
+  background-color: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-back::before {
+  content: '';
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  background-color: red;
+  transform: rotate(45deg);
 }
 
 .read-the-docs {
