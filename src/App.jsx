@@ -21,7 +21,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -43,12 +43,12 @@ const MemoryGame = () => {
     if (newFlippedIndices.length === 2) {
       setMoves(moves + 1);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
           setTimeout(() => setGameWon(true), 500);
@@ -145,9 +145,9 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'linear-gradient(135deg, #ff0000 0%, #cc0000 100%)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
@@ -158,7 +158,8 @@ const MemoryGame = () => {
                 transition: 'all 0.3s ease',
                 boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                 userSelect: 'none',
-                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
+                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1,
+                position: 'relative'
               }}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
@@ -169,7 +170,19 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: '50px',
+                  height: '50px',
+                  background: 'white',
+                  clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}/>
+              )}
             </div>
           ))}
         </div>
