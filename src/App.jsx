@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import cardBack from './assets/card-back.svg';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -169,7 +170,17 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <img
+                  src={cardBack}
+                  alt="Card Back"
+                  style={{
+                    width: '70px',
+                    height: '70px',
+                    objectFit: 'contain'
+                  }}
+                />
+              )}
             </div>
           ))}
         </div>
