@@ -147,7 +147,7 @@ const MemoryGame = () => {
                 height: '100px',
                 background: isCardVisible(index, card.symbol) 
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'white url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'30\' height=\'30\' viewBox=\'0 0 30 30\'%3E%3Cpolygon points=\'15,2 28,15 15,28 2,15\' fill=\'red\' /%3E%3C/svg%3E") center / 50% no-repeat',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
