@@ -169,7 +169,67 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol :
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(45deg, #2c3e50, #4a69bd)',
+                  borderRadius: '15px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    width: '80%',
+                    height: '80%',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle, #3498db, transparent 70%)',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                  }}></div>
+                  {/* Stars */}
+                  <div style={{
+                    position: 'absolute',
+                    width: '5px',
+                    height: '5px',
+                    borderRadius: '50%',
+                    background: 'white',
+                    top: '20%',
+                    left: '30%'
+                  }}></div>
+                  <div style={{
+                    position: 'absolute',
+                    width: '3px',
+                    height: '3px',
+                    borderRadius: '50%',
+                    background: 'white',
+                    top: '70%',
+                    left: '80%'
+                  }}></div>
+                  <div style={{
+                    position: 'absolute',
+                    width: '4px',
+                    height: '4px',
+                    borderRadius: '50%',
+                    background: 'white',
+                    top: '40%',
+                    left: '70%'
+                  }}></div>
+                  <div style={{
+                    position: 'absolute',
+                    width: '6px',
+                    height: '6px',
+                    borderRadius: '50%',
+                    background: 'white',
+                    top: '80%',
+                    left: '20%'
+                  }}></div>
+                </div>
+              }
             </div>
           ))}
         </div>
