@@ -153,6 +153,7 @@ const MemoryGame = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '48px',
+                color: isCardVisible(index, card.symbol) ? 'initial' : '#ff0000',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
