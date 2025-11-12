@@ -145,10 +145,11 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'repeating-linear-gradient(45deg, #4a90e2, #4a90e2 10px, #357abd 10px, #357abd 20px)',
                 borderRadius: '15px',
+                border: isCardVisible(index, card.symbol) ? 'none' : '2px solid #2c3e50',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -163,13 +164,29 @@ const MemoryGame = () => {
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
                   e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  color: '#fff',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+                }}>
+                  ★
+                </div>
+              )}
             </div>
           ))}
         </div>
