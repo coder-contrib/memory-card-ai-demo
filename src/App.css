@@ -35,6 +35,23 @@
 
 .card {
   padding: 2em;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.card-back {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2em;
+  color: #ff0000;
+}
+
+.card-back::before {
+  content: '♦';
+  margin-right: 0.2em;
 }
 
 .read-the-docs {
