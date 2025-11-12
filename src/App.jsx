@@ -145,7 +145,7 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
@@ -160,6 +160,7 @@ const MemoryGame = () => {
                 userSelect: 'none',
                 opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
               }}
+              className={!isCardVisible(index, card.symbol) ? 'card-back' : ''}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -169,7 +170,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) && card.symbol}
             </div>
           ))}
         </div>
