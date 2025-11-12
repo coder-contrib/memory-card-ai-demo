@@ -145,31 +145,84 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'linear-gradient(45deg, #2193b0 0%, #6dd5ed 100%)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: '28px',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                boxShadow: isCardVisible(index, card.symbol)
+                  ? '0 4px 8px rgba(0,0,0,0.2)'
+                  : '0 6px 12px rgba(0,0,0,0.3)',
                 userSelect: 'none',
-                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
+                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1,
+                position: 'relative',
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
                   e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
+                if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.3)';
+                }
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? (
+                card.symbol
+              ) : (
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  fontWeight: 'bold',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+                }}>
+                  ?
+                </div>
+              )}
+              {!isCardVisible(index, card.symbol) && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'radial-gradient(circle, transparent 20%, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 30%, transparent 30%, transparent 70%, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.1) 80%, transparent 80%)',
+                  backgroundSize: '10px 10px',
+                  opacity: 0.4
+                }}></div>
+              )}
+              {!isCardVisible(index, card.symbol) && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  border: '4px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '12px',
+                  boxSizing: 'border-box',
+                  background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+                  pointerEvents: 'none'
+                }}></div>
+              )}
             </div>
           ))}
         </div>
