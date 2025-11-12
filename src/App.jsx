@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
 
+// Add styles to the document head
+const addStyles = () => {
+  const style = document.createElement('style');
+  style.textContent = `
+    .card-back::before {
+      content: '♦';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      color: #ff0000;
+    }
+  `;
+  document.head.appendChild(style);
+};
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -71,6 +88,7 @@ const MemoryGame = () => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
+    addStyles();
   }, []);
 
   return (
@@ -145,7 +163,7 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
@@ -158,8 +176,11 @@ const MemoryGame = () => {
                 transition: 'all 0.3s ease',
                 boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                 userSelect: 'none',
-                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
+                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1,
+                position: 'relative',
+                overflow: 'hidden'
               }}
+              className={!isCardVisible(index, card.symbol) ? 'card-back' : ''}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
                   e.currentTarget.style.transform = 'scale(1.05)';
