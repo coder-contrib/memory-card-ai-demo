@@ -170,7 +170,11 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
+<<<<<<< HEAD
               {isCardVisible(index, card.symbol) ? card.symbol : '♦'}
+=======
+              {isCardVisible(index, card.symbol) ? card.symbol : '♦️'}
+>>>>>>> 76b67d0 (Change card back design to red diamond)
             </div>
           ))}
         </div>
