@@ -147,7 +147,7 @@ const MemoryGame = () => {
                 height: '100px',
                 background: isCardVisible(index, card.symbol) 
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'radial-gradient(circle at center, white 70%, #ff0000 70%)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
