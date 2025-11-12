@@ -35,6 +35,15 @@
 
 .card {
   padding: 2em;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+.card-back {
+  background: linear-gradient(45deg, #2c3e50 25%, #34495e 25%, #34495e 50%, #2c3e50 50%, #2c3e50 75%, #34495e 75%, #34495e 100%);
+  background-size: 20px 20px;
+  border: 2px solid #1a2634;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .read-the-docs {
