@@ -172,7 +172,14 @@ const MemoryGame = () => {
               }}
             >
               {isCardVisible(index, card.symbol) ? card.symbol : (
-                <>
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative'
+                }}>
                   <div style={{
                     position: 'absolute',
                     width: '60px',
@@ -188,7 +195,7 @@ const MemoryGame = () => {
                     fontSize: '32px',
                     fontWeight: 'bold'
                   }}>?</span>
-                </>
+                </div>
               )}
             </div>
           ))}
