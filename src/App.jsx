@@ -118,18 +118,18 @@ const MemoryGame = () => {
       {/* Header */}
       <div style={{
         textAlign: 'center',
-        marginBottom: '30px',
+        marginBottom: '2rem',
         color: 'white'
       }}>
         <h1 style={{
-          fontSize: '48px',
-          margin: '0 0 10px 0',
+          fontSize: '3rem',
+          margin: '0 0 0.5rem 0',
           textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
         }}>
           Memory Card Game
         </h1>
         <p style={{
-          fontSize: '18px',
+          fontSize: '1.125rem',
           margin: '0',
           opacity: 0.9
         }}>
@@ -141,9 +141,11 @@ const MemoryGame = () => {
       {gameStarted && (
         <div style={{
           display: 'flex',
-          gap: '30px',
-          marginBottom: '30px',
-          fontSize: '24px',
+          flexWrap: 'wrap',
+          justifyContent: 'center',
+          gap: '1rem',
+          marginBottom: '2rem',
+          fontSize: '1.5rem',
           color: 'white',
           fontWeight: 'bold'
         }}>
@@ -157,29 +159,30 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))',
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
           borderRadius: '20px',
           backdropFilter: 'blur(10px)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+          maxWidth: '100%',
+          width: '400px'
         }}>
           {cards.map((card, index) => (
             <div
               key={card.id}
               onClick={() => handleCardClick(index)}
               style={{
-                width: '100px',
-                height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                aspectRatio: '1',
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: '2rem',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
@@ -207,8 +210,8 @@ const MemoryGame = () => {
           <button
             onClick={initializeGame}
             style={{
-              padding: '20px 40px',
-              fontSize: '24px',
+              padding: '1.25rem 2.5rem',
+              fontSize: '1.5rem',
               background: 'white',
               border: 'none',
               borderRadius: '50px',
@@ -237,9 +240,9 @@ const MemoryGame = () => {
         <button
           onClick={initializeGame}
           style={{
-            marginTop: '30px',
-            padding: '12px 30px',
-            fontSize: '18px',
+            marginTop: '2rem',
+            padding: '0.75rem 1.875rem',
+            fontSize: '1.125rem',
             background: 'rgba(255, 255, 255, 0.2)',
             border: '2px solid white',
             borderRadius: '50px',
@@ -277,21 +280,23 @@ const MemoryGame = () => {
         }}>
           <div style={{
             background: 'white',
-            padding: '40px',
+            padding: '2.5rem',
             borderRadius: '20px',
             textAlign: 'center',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+            maxWidth: '90%',
+            width: '400px'
           }}>
             <h2 style={{
-              fontSize: '48px',
-              margin: '0 0 20px 0',
+              fontSize: '3rem',
+              margin: '0 0 1.25rem 0',
               color: '#667eea'
             }}>
               ⏰ Time's Up! ⏰
             </h2>
             <p style={{
-              fontSize: '24px',
-              margin: '0 0 30px 0',
+              fontSize: '1.5rem',
+              margin: '0 0 1.875rem 0',
               color: '#333'
             }}>
               Try again to beat the clock!
@@ -299,8 +304,8 @@ const MemoryGame = () => {
             <button
               onClick={initializeGame}
               style={{
-                padding: '15px 40px',
-                fontSize: '20px',
+                padding: '0.9375rem 2.5rem',
+                fontSize: '1.25rem',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 border: 'none',
                 borderRadius: '50px',
@@ -339,21 +344,23 @@ const MemoryGame = () => {
         }}>
           <div style={{
             background: 'white',
-            padding: '40px',
+            padding: '2.5rem',
             borderRadius: '20px',
             textAlign: 'center',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+            maxWidth: '90%',
+            width: '400px'
           }}>
             <h2 style={{
-              fontSize: '48px',
-              margin: '0 0 20px 0',
+              fontSize: '3rem',
+              margin: '0 0 1.25rem 0',
               color: '#667eea'
             }}>
               🎉 You Won! 🎉
             </h2>
             <p style={{
-              fontSize: '24px',
-              margin: '0 0 30px 0',
+              fontSize: '1.5rem',
+              margin: '0 0 1.875rem 0',
               color: '#333'
             }}>
               Completed in {moves} moves!
@@ -361,8 +368,8 @@ const MemoryGame = () => {
             <button
               onClick={initializeGame}
               style={{
-                padding: '15px 40px',
-                fontSize: '20px',
+                padding: '0.9375rem 2.5rem',
+                fontSize: '1.25rem',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 border: 'none',
                 borderRadius: '50px',
