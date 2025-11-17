@@ -147,7 +147,7 @@ const MemoryGame = () => {
                 height: '100px',
                 background: isCardVisible(index, card.symbol) 
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
@@ -169,7 +169,29 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '♦'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <div style={{
+                  width: '50px',
+                  height: '50px',
+                  transform: 'rotate(45deg)',
+                  background: 'linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%)',
+                  boxShadow: 'inset 0 0 15px rgba(255, 255, 255, 0.6)',
+                  border: '2px solid white',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <div style={{
+                    width: '30px',
+                    height: '30px',
+                    transform: 'rotate(0deg)',
+                    background: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
+                    boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.5)',
+                    border: '2px solid white'
+                  }}/>
+                </div>
+              )}
             </div>
           ))}
         </div>
