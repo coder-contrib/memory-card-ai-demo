@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import DifficultySelector from './components/DifficultySelector';
+import './components/DifficultySelector.css';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -7,13 +9,39 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [difficulty, setDifficulty] = useState('');
+
+  // Difficulty configurations
+  const difficultyConfig = {
+    easy: {
+      rows: 2,
+      cols: 3,
+      symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️'],
+      cardSize: 110,
+    },
+    medium: {
+      rows: 4,
+      cols: 4,
+      symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'],
+      cardSize: 100,
+    },
+    hard: {
+      rows: 4,
+      cols: 6,
+      symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', '👽', '🛰️', '👾', '🔭'],
+      cardSize: 90,
+    },
+  };
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    if (!difficulty) return;
+
+    const config = difficultyConfig[difficulty];
+    const shuffledCards = [...config.symbols, ...config.symbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -21,12 +49,18 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
+    setGameWon(false);
+  };
+
+  const handleDifficultySelect = (selectedDifficulty) => {
+    setDifficulty(selectedDifficulty);
+    setGameStarted(false);
     setGameWon(false);
   };
 
@@ -48,9 +82,9 @@ const MemoryGame = () => {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+        if (matchedPairs.length + 1 === difficultyConfig[difficulty].symbols.length) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -111,6 +145,11 @@ const MemoryGame = () => {
         </p>
       </div>
 
+      {/* Difficulty Selector */}
+      {!gameStarted && (
+        <DifficultySelector onSelectDifficulty={handleDifficultySelect} />
+      )}
+
       {/* Stats */}
       {gameStarted && (
         <div style={{
@@ -121,8 +160,9 @@ const MemoryGame = () => {
           color: 'white',
           fontWeight: 'bold'
         }}>
+          <div>Difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</div>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{difficultyConfig[difficulty].symbols.length}</div>
         </div>
       )}
 
@@ -130,7 +170,7 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${difficultyConfig[difficulty].cols}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -143,9 +183,9 @@ const MemoryGame = () => {
               key={card.id}
               onClick={() => handleCardClick(index)}
               style={{
-                width: '100px',
-                height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                width: `${difficultyConfig[difficulty].cardSize}px`,
+                height: `${difficultyConfig[difficulty].cardSize}px`,
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
@@ -177,38 +217,44 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
-          <button
-            onClick={initializeGame}
-            style={{
-              padding: '20px 40px',
-              fontSize: '24px',
-              background: 'white',
-              border: 'none',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              color: '#667eea',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-            }}
-          >
-            Start Game
-          </button>
+          {difficulty && (
+            <button
+              onClick={initializeGame}
+              style={{
+                padding: '20px 40px',
+                fontSize: '24px',
+                background: 'white',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: '#667eea',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+              }}
+            >
+              Start Game
+            </button>
+          )}
         </div>
       )}
 
       {/* Reset Button */}
       {gameStarted && (
         <button
-          onClick={initializeGame}
+          onClick={() => {
+            setGameStarted(false);
+            setGameWon(false);
+            setDifficulty('');
+          }}
           style={{
             marginTop: '30px',
             padding: '12px 30px',
@@ -230,7 +276,7 @@ const MemoryGame = () => {
             e.currentTarget.style.color = 'white';
           }}
         >
-          Reset Game
+          Change Difficulty
         </button>
       )}
 
@@ -270,7 +316,11 @@ const MemoryGame = () => {
               Completed in {moves} moves!
             </p>
             <button
-              onClick={initializeGame}
+              onClick={() => {
+                setGameStarted(false);
+                setGameWon(false);
+                setDifficulty('');
+              }}
               style={{
                 padding: '15px 40px',
                 fontSize: '20px',

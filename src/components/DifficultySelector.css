@@ -1,0 +1,26 @@
+.difficulty-selector {
+  text-align: center;
+  padding: 2rem;
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.difficulty-buttons button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #4a90e2;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.difficulty-buttons button:hover {
+  background-color: #357abd;
+}
