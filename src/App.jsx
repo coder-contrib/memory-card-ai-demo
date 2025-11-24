@@ -7,13 +7,16 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [difficulty, setDifficulty] = useState(4); // 4x4 grid by default
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    const totalPairs = Math.floor(difficulty * difficulty / 2);
+    const gameSymbols = cardSymbols.slice(0, totalPairs);
+    const shuffledCards = [...gameSymbols, ...gameSymbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -21,7 +24,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -50,7 +53,7 @@ const MemoryGame = () => {
         setFlippedIndices([]);
         
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+        if (matchedPairs.length + 1 === Math.floor(difficulty * difficulty / 2)) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -122,7 +125,38 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{Math.floor(difficulty * difficulty / 2)}</div>
+        </div>
+      )}
+
+      {/* Difficulty Selector */}
+      {!gameStarted && (
+        <div style={{
+          marginBottom: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <label htmlFor="difficulty" style={{ color: 'white', fontSize: '18px' }}>
+            Select Difficulty:
+          </label>
+          <select
+            id="difficulty"
+            value={difficulty}
+            onChange={(e) => setDifficulty(Number(e.target.value))}
+            style={{
+              padding: '10px',
+              fontSize: '16px',
+              borderRadius: '5px',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <option value={4}>Easy (4x4)</option>
+            <option value={6}>Medium (6x6)</option>
+            <option value={8}>Hard (8x8)</option>
+          </select>
         </div>
       )}
 
@@ -130,7 +164,7 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${difficulty}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
