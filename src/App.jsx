@@ -7,13 +7,16 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [gridSize, setGridSize] = useState(4); // Default to 4x4 grid
 
   // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', '🛰️', '🌠', '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘', '🔭', '🌍', '🌎', '🌏', '🌞', '🌚', '💫', '✨', '🌈', '🌊', '🌋', '🏔️', '🗻', '🏜️'];
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    const pairCount = (gridSize * gridSize) / 2;
+    const gameSymbols = cardSymbols.slice(0, pairCount);
+    const shuffledCards = [...gameSymbols, ...gameSymbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -21,7 +24,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -48,9 +51,9 @@ const MemoryGame = () => {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+        if (matchedPairs.length + 1 === (gridSize * gridSize) / 2) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -122,7 +125,7 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{(gridSize * gridSize) / 2}</div>
         </div>
       )}
 
@@ -130,7 +133,7 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -143,16 +146,16 @@ const MemoryGame = () => {
               key={card.id}
               onClick={() => handleCardClick(index)}
               style={{
-                width: '100px',
-                height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                width: gridSize === 4 ? '100px' : gridSize === 6 ? '80px' : '60px',
+                height: gridSize === 4 ? '100px' : gridSize === 6 ? '80px' : '60px',
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: `${48 / gridSize * 4}px`,
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
@@ -177,6 +180,31 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          <div style={{
+            marginBottom: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            <label htmlFor="gridSize" style={{ color: 'white', fontSize: '18px' }}>Choose difficulty:</label>
+            <select
+              id="gridSize"
+              value={gridSize}
+              onChange={(e) => setGridSize(Number(e.target.value))}
+              style={{
+                padding: '10px 20px',
+                fontSize: '18px',
+                borderRadius: '10px',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="4">4x4 (Easy)</option>
+              <option value="6">6x6 (Medium)</option>
+              <option value="8">8x8 (Hard)</option>
+            </select>
+          </div>
           <button
             onClick={initializeGame}
             style={{
