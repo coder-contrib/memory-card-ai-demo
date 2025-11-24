@@ -40,3 +40,24 @@
 .read-the-docs {
   color: #888;
 }
+
+.diamond {
+  width: 0;
+  height: 0;
+  border: 25px solid transparent;
+  border-bottom-color: #667eea;
+  position: relative;
+  top: -25px;
+  margin: 0 auto;
+}
+
+.diamond:after {
+  content: '';
+  position: absolute;
+  left: -25px;
+  top: 25px;
+  width: 0;
+  height: 0;
+  border: 25px solid transparent;
+  border-top-color: #764ba2;
+}
