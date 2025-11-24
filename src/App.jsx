@@ -7,13 +7,26 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [difficulty, setDifficulty] = useState('4x4');
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Card emojis for the game based on difficulty
+  const symbolsByDifficulty = {
+    '4x4': ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'],
+    '6x6': ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', '🌍', '🌕', '🌑', '🌠', '🛰️', '🔭', '💫', '🌛', '🌝', '🌞'],
+    '8x8': ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', '🌍', '🌕', '🌑', '🌠', '🛰️', '🔭', '💫', '🌛', '🌝', '🌞', '🎇', '🎆', '✨', '⚡', '🌈', '🔥', '💥', '🌊', '🌪️', '🌩️', '🌤️', '🌅', '🌄', '🌋']
+  };
+
+  const cardSymbols = symbolsByDifficulty[difficulty];
 
   // Initialize game
-  const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+  const initializeGame = (newDifficulty = difficulty) => {
+    // Update difficulty if provided
+    if (newDifficulty !== difficulty) {
+      setDifficulty(newDifficulty);
+    }
+
+    const symbols = symbolsByDifficulty[newDifficulty];
+    const shuffledCards = [...symbols, ...symbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -21,7 +34,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -130,7 +143,7 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${difficulty.split('x')[0]}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -177,31 +190,54 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
-          <button
-            onClick={initializeGame}
-            style={{
-              padding: '20px 40px',
+          <div style={{
+            marginBottom: '30px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '15px'
+          }}>
+            <p style={{
+              color: 'white',
               fontSize: '24px',
-              background: 'white',
-              border: 'none',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              color: '#667eea',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-            }}
-          >
-            Start Game
-          </button>
+              margin: '0'
+            }}>
+              Select Difficulty:
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '15px'
+            }}>
+              {Object.keys(symbolsByDifficulty).map(level => (
+                <button
+                  key={level}
+                  onClick={() => initializeGame(level)}
+                  style={{
+                    padding: '15px 30px',
+                    fontSize: '20px',
+                    background: 'white',
+                    border: 'none',
+                    borderRadius: '50px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: '#667eea',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+                  }}
+                >
+                  {level}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
