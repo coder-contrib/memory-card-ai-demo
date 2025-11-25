@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import redDiamond from './assets/red-diamond.png';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -145,9 +146,10 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : `url(${redDiamond}) no-repeat center center, white`,
+                backgroundSize: isCardVisible(index, card.symbol) ? 'cover' : '50%, cover',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
@@ -169,7 +171,14 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <span style={{
+                  fontWeight: 'bold',
+                  fontSize: '40px',
+                  color: '#d01f1f',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
+                }}>?</span>
+              )}
             </div>
           ))}
         </div>
