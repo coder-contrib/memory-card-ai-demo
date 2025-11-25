@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import redDiamond from './assets/red-diamond.svg';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -169,7 +170,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : <img src={redDiamond} alt="Card back" style={{ width: '50px', height: '50px' }} />}
             </div>
           ))}
         </div>
