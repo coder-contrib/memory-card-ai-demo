@@ -67,10 +67,27 @@ const MemoryGame = () => {
     return flippedIndices.includes(index) || matchedPairs.includes(symbol);
   };
 
+  // Define pulsing animation in useEffect
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
+
+    // Add keyframes for pulsing effect
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = `
+      @keyframes pulseCard {
+        0% { transform: scale(1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        50% { transform: scale(1.02); box-shadow: 0 6px 12px rgba(0,0,0,0.25); }
+        100% { transform: scale(1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
   }, []);
 
   return (
@@ -145,20 +162,23 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'linear-gradient(135deg, #1e3b70 0%, #29539b 50%, #1e3b70 100%)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: isCardVisible(index, card.symbol) ? '48px' : '36px',
+                color: isCardVisible(index, card.symbol) ? 'inherit' : 'white',
+                textShadow: isCardVisible(index, card.symbol) ? 'none' : '0 0 5px rgba(255,255,255,0.5)',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
                 boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                 userSelect: 'none',
-                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
+                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1,
+                animation: !isCardVisible(index, card.symbol) ? 'pulseCard 2s infinite ease-in-out' : 'none'
               }}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
@@ -169,7 +189,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : '✧'}
             </div>
           ))}
         </div>
