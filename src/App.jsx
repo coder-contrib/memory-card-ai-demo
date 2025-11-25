@@ -145,9 +145,14 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : '#e0e0e0',
+                backgroundImage: isCardVisible(index, card.symbol)
+                  ? 'none'
+                  : 'radial-gradient(circle, transparent 0%, transparent 45%, #e51c23 45%, #e51c23 55%, transparent 55%, transparent 100%)',
+                backgroundSize: '40px 40px',
+                backgroundPosition: 'center',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
