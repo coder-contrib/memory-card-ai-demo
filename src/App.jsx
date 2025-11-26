@@ -169,7 +169,24 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {isCardVisible(index, card.symbol) ? card.symbol : (
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    backgroundColor: '#ff0000',
+                    transform: 'rotate(45deg)',
+                    position: 'absolute'
+                  }} />
+                )}
+              </div>
             </div>
           ))}
         </div>
