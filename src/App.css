@@ -37,6 +37,22 @@
   padding: 2em;
 }
 
+.card-back {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-back::after {
+  content: '';
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: #ff0000;
+  transform: rotate(45deg);
+}
+
 .read-the-docs {
   color: #888;
 }
