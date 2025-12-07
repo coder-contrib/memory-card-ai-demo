@@ -169,7 +169,9 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              <span style={{ color: isCardVisible(index, card.symbol) ? 'inherit' : 'red', fontSize: isCardVisible(index, card.symbol) ? '48px' : '60px' }}>
+                {isCardVisible(index, card.symbol) ? card.symbol : '♦️'}
+              </span>
             </div>
           ))}
         </div>
