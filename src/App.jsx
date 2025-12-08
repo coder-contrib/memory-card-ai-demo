@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import cardBackBlueSvg from './assets/card-back.svg';
 import cardBackRedSvg from './assets/card-back-red.svg';
+import Settings from './components/Settings';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -10,6 +11,7 @@ const MemoryGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   const [cardBackColor, setCardBackColor] = useState('blue');
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -114,47 +116,37 @@ const MemoryGame = () => {
         </p>
       </div>
 
+      {/* Settings Button */}
+      <button
+        onClick={() => setIsSettingsOpen(true)}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          padding: '10px 20px',
+          fontSize: '16px',
+          background: 'rgba(255, 255, 255, 0.2)',
+          border: '2px solid white',
+          borderRadius: '50px',
+          color: 'white',
+          cursor: 'pointer',
+        }}
+      >
+        Settings
+      </button>
+
       {/* Stats */}
       {gameStarted && (
         <div style={{
           display: 'flex',
           gap: '30px',
           marginBottom: '30px',
+          fontSize: '24px',
           color: 'white',
+          fontWeight: 'bold'
         }}>
-          <div style={{ fontSize: '24px', fontWeight: 'bold' }}>Moves: {moves}</div>
-          <div style={{ fontSize: '24px', fontWeight: 'bold' }}>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '18px' }}>Card Back:</span>
-            <button
-              onClick={() => setCardBackColor('blue')}
-              style={{
-                padding: '5px 15px',
-                background: cardBackColor === 'blue' ? '#667eea' : 'rgba(255, 255, 255, 0.2)',
-                border: '2px solid white',
-                borderRadius: '15px',
-                color: 'white',
-                cursor: 'pointer',
-                fontWeight: cardBackColor === 'blue' ? 'bold' : 'normal'
-              }}
-            >
-              Blue
-            </button>
-            <button
-              onClick={() => setCardBackColor('red')}
-              style={{
-                padding: '5px 15px',
-                background: cardBackColor === 'red' ? '#c41e3a' : 'rgba(255, 255, 255, 0.2)',
-                border: '2px solid white',
-                borderRadius: '15px',
-                color: 'white',
-                cursor: 'pointer',
-                fontWeight: cardBackColor === 'red' ? 'bold' : 'normal'
-              }}
-            >
-              Red
-            </button>
-          </div>
+          <div>Moves: {moves}</div>
+          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
         </div>
       )}
 
@@ -337,6 +329,14 @@ const MemoryGame = () => {
           </div>
         </div>
       )}
+
+      {/* Settings Modal */}
+      <Settings
+        cardBackColor={cardBackColor}
+        setCardBackColor={setCardBackColor}
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </div>
   );
 };
