@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import ThemeSelector from './ThemeSelector';
+import themes from './themeData';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -7,13 +9,11 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
-
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  const [currentTheme, setCurrentTheme] = useState('Space');
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    const shuffledCards = [...themes[currentTheme], ...themes[currentTheme]]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -21,13 +21,20 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+  };
+
+  const handleThemeChange = (newTheme) => {
+    setCurrentTheme(newTheme);
+    if (gameStarted) {
+      initializeGame();
+    }
   };
 
   // Handle card click
@@ -111,6 +118,9 @@ const MemoryGame = () => {
         </p>
       </div>
 
+      {/* Theme Selector */}
+      <ThemeSelector currentTheme={currentTheme} onThemeChange={handleThemeChange} />
+
       {/* Stats */}
       {gameStarted && (
         <div style={{
@@ -122,7 +132,7 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{themes[currentTheme].length}</div>
         </div>
       )}
 
