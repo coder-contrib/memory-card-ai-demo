@@ -32,9 +32,7 @@ const MemoryGame = () => {
 
   const handleThemeChange = (newTheme) => {
     setCurrentTheme(newTheme);
-    if (gameStarted) {
-      initializeGame();
-    }
+    initializeGame();
   };
 
   // Handle card click
