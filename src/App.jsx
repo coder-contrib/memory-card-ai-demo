@@ -152,14 +152,14 @@ const MemoryGame = () => {
                 height: '100px',
                 background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : lastGuessCorrect === true
+                    ? '#2ecc71' // Green background for correct guess
+                    : lastGuessCorrect === false
+                      ? '#e74c3c' // Red background for incorrect guess
+                      : 'white', // Default white background
                 color: isCardVisible(index, card.symbol)
                   ? 'inherit'
-                  : lastGuessCorrect === true
-                    ? '#2ecc71' // Green for correct guess
-                    : lastGuessCorrect === false
-                      ? '#e74c3c' // Red for incorrect guess
-                      : '#3498db', // Default blue
+                  : 'black',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
