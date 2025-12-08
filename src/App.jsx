@@ -7,6 +7,7 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [lastGuessCorrect, setLastGuessCorrect] = useState(null);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -28,6 +29,7 @@ const MemoryGame = () => {
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setLastGuessCorrect(null);
   };
 
   // Handle card click
@@ -46,17 +48,20 @@ const MemoryGame = () => {
       
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
+        setLastGuessCorrect(true);
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
-        // No match, flip back after delay
+        // No match
+        setLastGuessCorrect(false);
         setTimeout(() => {
           setFlippedIndices([]);
+          setLastGuessCorrect(null);
         }, 1000);
       }
     }
@@ -148,7 +153,13 @@ const MemoryGame = () => {
                 background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
-                color: isCardVisible(index, card.symbol) ? 'inherit' : '#e74c3c',
+                color: isCardVisible(index, card.symbol)
+                  ? 'inherit'
+                  : lastGuessCorrect === true
+                    ? '#2ecc71' // Green for correct guess
+                    : lastGuessCorrect === false
+                      ? '#e74c3c' // Red for incorrect guess
+                      : '#3498db', // Default blue
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
