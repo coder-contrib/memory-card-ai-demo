@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import cardBackSvg from './assets/card-back.svg';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -145,9 +146,9 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : '#ffffff',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
@@ -169,7 +170,17 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <img
+                  src={cardBackSvg}
+                  alt="Card back"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '15px'
+                  }}
+                />
+              )}
             </div>
           ))}
         </div>
