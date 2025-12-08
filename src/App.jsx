@@ -116,6 +116,13 @@ const MemoryGame = () => {
         }}>
           Match all the pairs to win!
         </p>
+        <p style={{
+          fontSize: '24px',
+          margin: '10px 0 0 0',
+          fontWeight: 'bold'
+        }}>
+          Current Theme: {currentTheme}
+        </p>
       </div>
 
       {/* Theme Selector */}
