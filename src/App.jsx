@@ -11,6 +11,14 @@ const MemoryGame = () => {
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
 
+  // Extended set of emoji symbols for adding new cards
+  const extendedSymbols = [
+    '🎮', '🎯', '🎪', '🎨', '🎭', '🎪', '🎡', '🎢',
+    '🧩', '🎲', '🎰', '🎪', '🏆', '🏅', '🎖️', '🥇',
+    '🍕', '🍔', '🍦', '🍭', '🍫', '🍿', '🥤', '🧁',
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'
+  ];
+
   // Initialize game
   const initializeGame = () => {
     const shuffledCards = [...cardSymbols, ...cardSymbols]
@@ -21,13 +29,20 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+  };
+
+  // Check if game is won
+  const checkWinCondition = () => {
+    if (matchedPairs.length === cards.length / 2 && cards.length >= cardSymbols.length * 2) {
+      setTimeout(() => setGameWon(true), 500);
+    }
   };
 
   // Handle card click
@@ -43,23 +58,40 @@ const MemoryGame = () => {
     if (newFlippedIndices.length === 2) {
       setMoves(moves + 1);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
+        // Add new pair of cards
+        addNewCards();
+
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
-          setTimeout(() => setGameWon(true), 500);
-        }
+        checkWinCondition();
       } else {
         // No match, flip back after delay
         setTimeout(() => {
           setFlippedIndices([]);
         }, 1000);
+
+        // Add new pair of cards
+        addNewCards();
       }
     }
+  };
+
+  // Add new pair of cards
+  const addNewCards = () => {
+    const availableSymbols = extendedSymbols.filter(symbol => !cards.some(card => card.symbol === symbol));
+    if (availableSymbols.length === 0) return; // No more symbols to add
+
+    const newSymbol = availableSymbols[Math.floor(Math.random() * availableSymbols.length)];
+    const newCards = [
+      { id: cards.length, symbol: newSymbol, isFlipped: false, isMatched: false },
+      { id: cards.length + 1, symbol: newSymbol, isFlipped: false, isMatched: false }
+    ];
+    setCards([...cards, ...newCards]);
   };
 
   // Check if card should be shown
@@ -122,7 +154,7 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{cards.length/2}</div>
         </div>
       )}
 
@@ -130,13 +162,16 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${Math.ceil(Math.sqrt(cards.length))}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
           borderRadius: '20px',
           backdropFilter: 'blur(10px)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+          maxWidth: '80vw',
+          maxHeight: '70vh',
+          overflowY: 'auto'
         }}>
           {cards.map((card, index) => (
             <div
