@@ -16,6 +16,16 @@ const MemoryGame = () => {
     flags: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺']
   };
 
+  // Reset game
+  const resetGame = () => {
+    setCards([]);
+    setFlippedIndices([]);
+    setMatchedPairs([]);
+    setMoves(0);
+    setGameStarted(false);
+    setGameWon(false);
+  };
+
   // Initialize game
   const initializeGame = () => {
     const shuffledCards = [...themes[theme], ...themes[theme]]
@@ -266,7 +276,7 @@ const MemoryGame = () => {
       {/* Reset Button */}
       {gameStarted && (
         <button
-          onClick={initializeGame}
+          onClick={resetGame}
           style={{
             marginTop: '30px',
             padding: '12px 30px',
@@ -328,7 +338,7 @@ const MemoryGame = () => {
               Completed in {moves} moves!
             </p>
             <button
-              onClick={initializeGame}
+              onClick={resetGame}
               style={{
                 padding: '15px 40px',
                 fontSize: '20px',
