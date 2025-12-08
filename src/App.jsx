@@ -32,7 +32,20 @@ const MemoryGame = () => {
 
   const handleThemeChange = (newTheme) => {
     setCurrentTheme(newTheme);
-    initializeGame();
+    const shuffledCards = [...themes[newTheme], ...themes[newTheme]]
+      .sort(() => Math.random() - 0.5)
+      .map((symbol, index) => ({
+        id: index,
+        symbol,
+        isFlipped: false,
+        isMatched: false
+      }));
+    setCards(shuffledCards);
+    setFlippedIndices([]);
+    setMatchedPairs([]);
+    setMoves(0);
+    setGameStarted(true);
+    setGameWon(false);
   };
 
   // Handle card click
