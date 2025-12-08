@@ -1,5 +1,20 @@
 import React, { useState, useEffect } from 'react';
 
+const THEMES = {
+  EMOJI: {
+    name: 'Emoji',
+    symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌']
+  },
+  ANIMALS: {
+    name: 'Animals',
+    symbols: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼']
+  },
+  FLAGS: {
+    name: 'Flags',
+    symbols: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺']
+  }
+};
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -10,13 +25,12 @@ const MemoryGame = () => {
   const [timer, setTimer] = useState(-256);
   const [timerActive, setTimerActive] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  const [selectedTheme, setSelectedTheme] = useState('EMOJI');
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    const themeSymbols = THEMES[selectedTheme].symbols;
+    const shuffledCards = [...themeSymbols, ...themeSymbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -54,9 +68,9 @@ const MemoryGame = () => {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+        if (matchedPairs.length + 1 === THEMES[selectedTheme].symbols.length) {
           setTimerActive(false);
           setTimeout(() => setGameWon(true), 500);
         }
@@ -150,7 +164,7 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{THEMES[selectedTheme].symbols.length}</div>
           <div>Time: {timer}</div>
         </div>
       )}
@@ -214,6 +228,39 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          <h2 style={{
+            fontSize: '24px',
+            color: 'white',
+            marginBottom: '20px'
+          }}>
+            Select a Theme
+          </h2>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '15px',
+            marginBottom: '30px'
+          }}>
+            {Object.entries(THEMES).map(([key, theme]) => (
+              <button
+                key={key}
+                onClick={() => setSelectedTheme(key)}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '18px',
+                  background: selectedTheme === key ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                  border: '2px solid white',
+                  borderRadius: '50px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  color: selectedTheme === key ? '#667eea' : 'white',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                {theme.name}
+              </button>
+            ))}
+          </div>
           <button
             onClick={initializeGame}
             style={{
