@@ -26,6 +26,14 @@ const MemoryGame = () => {
   const [timerActive, setTimerActive] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState('EMOJI');
+  const [highScore, setHighScore] = useState(() => {
+    const saved = localStorage.getItem('highScore');
+    return saved !== null ? JSON.parse(saved) : { moves: Infinity, time: Infinity };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('highScore', JSON.stringify(highScore));
+  }, [highScore]);
 
   // Initialize game
   const initializeGame = () => {
@@ -72,6 +80,27 @@ const MemoryGame = () => {
         // Check if game is won
         if (matchedPairs.length + 1 === THEMES[selectedTheme].symbols.length) {
           setTimerActive(false);
+
+          // Update high score if current score is better
+          const currentTime = timer;
+          const currentMoves = moves + 1;
+
+          setHighScore(prevHighScore => {
+            const newHighScore = { ...prevHighScore };
+
+            // Lower moves is better
+            if (currentMoves < prevHighScore.moves) {
+              newHighScore.moves = currentMoves;
+            }
+
+            // Higher (less negative) time is better when using the countdown
+            if (currentTime > prevHighScore.time) {
+              newHighScore.time = currentTime;
+            }
+
+            return newHighScore;
+          });
+
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -166,6 +195,18 @@ const MemoryGame = () => {
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{THEMES[selectedTheme].symbols.length}</div>
           <div>Time: {timer}</div>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '10px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: '10px'
+          }}>
+            <div style={{ fontSize: '16px', opacity: 0.9 }}>Best Score:</div>
+            <div>Moves: {highScore.moves === Infinity ? '-' : highScore.moves}</div>
+            <div>Time: {highScore.time === Infinity ? '-' : Math.abs(highScore.time)}</div>
+          </div>
         </div>
       )}
 
