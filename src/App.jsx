@@ -7,12 +7,18 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [difficulty, setDifficulty] = useState('easy'); // 'easy', 'medium', 'hard'
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Card emojis for each difficulty level
+  const cardSymbolsMap = {
+    easy: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'],
+    medium: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', '🌍', '🌞', '🌚', '🌠', '💫', '🌎', '🌏', '🌑', '🌒', '🌓'],
+    hard: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', '🌍', '🌞', '🌚', '🌠', '💫', '🌎', '🌏', '🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘', '🌜', '🌛', '🌝', '🌞', '🌟', '💫', '✨', '⚡', '🔥']
+  };
 
   // Initialize game
   const initializeGame = () => {
+    const cardSymbols = cardSymbolsMap[difficulty];
     const shuffledCards = [...cardSymbols, ...cardSymbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
@@ -21,7 +27,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -48,9 +54,9 @@ const MemoryGame = () => {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+        if (matchedPairs.length + 1 === cardSymbolsMap[difficulty].length) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -122,7 +128,8 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{cardSymbolsMap[difficulty].length}</div>
+          <div>Difficulty: {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</div>
         </div>
       )}
 
@@ -130,8 +137,8 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '15px',
+          gridTemplateColumns: difficulty === 'easy' ? 'repeat(4, 1fr)' : difficulty === 'medium' ? 'repeat(6, 1fr)' : 'repeat(8, 1fr)',
+          gap: difficulty === 'easy' ? '15px' : difficulty === 'medium' ? '12px' : '10px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
           borderRadius: '20px',
@@ -143,8 +150,8 @@ const MemoryGame = () => {
               key={card.id}
               onClick={() => handleCardClick(index)}
               style={{
-                width: '100px',
-                height: '100px',
+                width: difficulty === 'easy' ? '100px' : difficulty === 'medium' ? '80px' : '60px',
+                height: difficulty === 'easy' ? '100px' : difficulty === 'medium' ? '80px' : '60px',
                 background: isCardVisible(index, card.symbol) 
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
@@ -152,7 +159,7 @@ const MemoryGame = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: difficulty === 'easy' ? '48px' : difficulty === 'medium' ? '36px' : '28px',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
@@ -175,8 +182,69 @@ const MemoryGame = () => {
         </div>
       ) : (
         <div style={{
-          textAlign: 'center'
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '30px'
         }}>
+          <div style={{
+            display: 'flex',
+            gap: '20px',
+            marginBottom: '20px'
+          }}>
+            <button
+              onClick={() => setDifficulty('easy')}
+              style={{
+                padding: '15px 30px',
+                fontSize: '20px',
+                background: difficulty === 'easy' ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: '#667eea',
+                boxShadow: difficulty === 'easy' ? '0 4px 15px rgba(0,0,0,0.3)' : '0 4px 15px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Easy (4x4)
+            </button>
+            <button
+              onClick={() => setDifficulty('medium')}
+              style={{
+                padding: '15px 30px',
+                fontSize: '20px',
+                background: difficulty === 'medium' ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: '#667eea',
+                boxShadow: difficulty === 'medium' ? '0 4px 15px rgba(0,0,0,0.3)' : '0 4px 15px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Medium (6x6)
+            </button>
+            <button
+              onClick={() => setDifficulty('hard')}
+              style={{
+                padding: '15px 30px',
+                fontSize: '20px',
+                background: difficulty === 'hard' ? 'white' : 'rgba(255, 255, 255, 0.6)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: '#667eea',
+                boxShadow: difficulty === 'hard' ? '0 4px 15px rgba(0,0,0,0.3)' : '0 4px 15px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              Hard (8x8)
+            </button>
+          </div>
           <button
             onClick={initializeGame}
             style={{
@@ -267,7 +335,7 @@ const MemoryGame = () => {
               margin: '0 0 30px 0',
               color: '#333'
             }}>
-              Completed in {moves} moves!
+              Completed in {moves} moves on {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} difficulty!
             </p>
             <button
               onClick={initializeGame}
@@ -291,6 +359,32 @@ const MemoryGame = () => {
               }}
             >
               Play Again
+            </button>
+            <button
+              onClick={() => {
+                setGameStarted(false);
+                setGameWon(false);
+              }}
+              style={{
+                marginTop: '15px',
+                padding: '12px 30px',
+                fontSize: '16px',
+                background: 'rgba(255, 255, 255, 0.2)',
+                border: '2px solid #667eea',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: '#667eea',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'white';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+              }}
+            >
+              Change Difficulty
             </button>
           </div>
         </div>
