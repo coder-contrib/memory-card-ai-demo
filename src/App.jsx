@@ -7,13 +7,18 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [theme, setTheme] = useState('emoji');
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Theme symbol arrays
+  const themes = {
+    emoji: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'],
+    flags: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺']
+  };
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    const shuffledCards = [...themes[theme], ...themes[theme]]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -21,7 +26,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -50,7 +55,7 @@ const MemoryGame = () => {
         setFlippedIndices([]);
         
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+        if (matchedPairs.length + 1 === themes[theme].length) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -107,7 +112,7 @@ const MemoryGame = () => {
           margin: '0',
           opacity: 0.9
         }}>
-          Match all the pairs to win!
+          {gameStarted ? 'Match all the pairs to win!' : 'Select a theme to begin'}
         </p>
       </div>
 
@@ -122,7 +127,7 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{themes[theme].length}</div>
         </div>
       )}
 
@@ -145,7 +150,7 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
@@ -177,6 +182,59 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          <div style={{
+            marginBottom: '30px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '20px'
+          }}>
+            <div style={{
+              display: 'flex',
+              gap: '15px',
+              justifyContent: 'center'
+            }}>
+              {Object.keys(themes).map((themeKey) => (
+                <button
+                  key={themeKey}
+                  onClick={() => setTheme(themeKey)}
+                  style={{
+                    padding: '15px 30px',
+                    fontSize: '20px',
+                    background: theme === themeKey ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                    border: '2px solid white',
+                    borderRadius: '50px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: theme === themeKey ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (theme !== themeKey) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (theme !== themeKey) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                    }
+                  }}
+                >
+                  {themeKey.charAt(0).toUpperCase() + themeKey.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div style={{
+              display: 'flex',
+              gap: '10px',
+              fontSize: '24px'
+            }}>
+              {themes[theme].slice(0, 4).map((symbol, index) => (
+                <span key={index}>{symbol}</span>
+              ))}
+              <span>...</span>
+            </div>
+          </div>
           <button
             onClick={initializeGame}
             style={{
