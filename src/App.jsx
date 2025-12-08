@@ -57,7 +57,7 @@ const MemoryGame = () => {
         setFlippedIndices([]);
         
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+        if (matchedPairs.length + 1 === themes[currentTheme].length) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {

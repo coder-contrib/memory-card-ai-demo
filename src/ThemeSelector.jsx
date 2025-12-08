@@ -3,8 +3,8 @@ import React from 'react';
 const ThemeSelector = ({ currentTheme, onThemeChange }) => {
   const themes = [
     { name: 'Space', emoji: '🚀' },
-    { name: 'Animals', emoji: '🐼' },
-    { name: 'Flags', emoji: '🏳️' },
+    { name: 'Animals', emoji: '🦁' },
+    { name: 'Food', emoji: '🍕' },
   ];
 
   return (
