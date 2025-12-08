@@ -9,6 +9,8 @@ const MemoryGame = () => {
   const [gameWon, setGameWon] = useState(false);
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameLost, setGameLost] = useState(false);
+  const [bestScore, setBestScore] = useState(localStorage.getItem('bestScore') ? parseInt(localStorage.getItem('bestScore')) : Infinity);
+  const [gamesPlayed, setGamesPlayed] = useState(localStorage.getItem('gamesPlayed') ? parseInt(localStorage.getItem('gamesPlayed')) : 0);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -32,6 +34,9 @@ const MemoryGame = () => {
     setGameWon(false);
     setGameLost(false);
     setTimeLeft(60);
+    const newGamesPlayed = gamesPlayed + 1;
+    setGamesPlayed(newGamesPlayed);
+    localStorage.setItem('gamesPlayed', newGamesPlayed.toString());
   };
 
   // Handle card click
@@ -55,7 +60,14 @@ const MemoryGame = () => {
         
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
-          setTimeout(() => setGameWon(true), 500);
+          setTimeout(() => {
+            // Update best score if current score is better
+            if (moves + 1 < bestScore) {
+              setBestScore(moves + 1);
+              localStorage.setItem('bestScore', (moves + 1).toString());
+            }
+            setGameWon(true);
+          }, 500);
         }
       } else {
         // No match, flip back after delay
@@ -140,6 +152,8 @@ const MemoryGame = () => {
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
           <div>Time Left: {timeLeft}s</div>
+          {bestScore !== Infinity && <div>Best: {bestScore} moves</div>}
+          <div>Games: {gamesPlayed}</div>
         </div>
       )}
 
@@ -354,6 +368,16 @@ const MemoryGame = () => {
               color: '#333'
             }}>
               Completed in {moves} moves!
+              {moves === bestScore && (
+                <span style={{
+                  display: 'block',
+                  color: '#e74c3c',
+                  marginTop: '10px',
+                  fontSize: '20px'
+                }}>
+                  🏆 New Best Score! 🏆
+                </span>
+              )}
             </p>
             <button
               onClick={initializeGame}
