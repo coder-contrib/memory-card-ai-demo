@@ -36,6 +36,16 @@ const MemoryGame = () => {
     }
   };
 
+  // Reset game to selection screen
+  const resetGame = () => {
+    setCards([]);
+    setFlippedIndices([]);
+    setMatchedPairs([]);
+    setMoves(0);
+    setGameStarted(false);
+    setGameWon(false);
+  };
+
   // Initialize game
   const initializeGame = () => {
     const symbols = themes[theme].slice(0, difficulties[difficulty].pairs);
