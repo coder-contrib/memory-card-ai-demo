@@ -474,7 +474,10 @@ const MemoryGame = () => {
               )}
             </p>
             <button
-              onClick={initializeGame}
+              onClick={() => {
+                setGameStarted(false);
+                setGameWon(false);
+              }}
               style={{
                 padding: '15px 40px',
                 fontSize: '20px',
@@ -494,7 +497,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              Play Again
+              Return to Start
             </button>
           </div>
         </div>
