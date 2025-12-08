@@ -11,9 +11,45 @@ const MemoryGame = () => {
   const [gameLost, setGameLost] = useState(false);
   const [bestScore, setBestScore] = useState(localStorage.getItem('bestScore') ? parseInt(localStorage.getItem('bestScore')) : Infinity);
   const [gamesPlayed, setGamesPlayed] = useState(localStorage.getItem('gamesPlayed') ? parseInt(localStorage.getItem('gamesPlayed')) : 0);
+  const [selectedTheme, setSelectedTheme] = useState(localStorage.getItem('selectedTheme') || 'emoji');
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Theme options
+  const themes = {
+    emoji: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'],
+    flags: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺'],
+  };
+
+  // Card symbols for the game
+  const cardSymbols = themes[selectedTheme];
+
+  // Get theme-specific styles
+  const getThemeStyles = () => {
+    switch(selectedTheme) {
+      case 'animals':
+        return {
+          background: 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)',
+          cardBack: '#e8f5e9'
+        };
+      case 'flags':
+        return {
+          background: 'linear-gradient(135deg, #3F51B5 0%, #1A237E 100%)',
+          cardBack: '#e8eaf6'
+        };
+      default: // emoji
+        return {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          cardBack: 'white'
+        };
+    }
+  };
+
+  const themeStyles = getThemeStyles();
+
+  const handleThemeChange = (theme) => {
+    setSelectedTheme(theme);
+    localStorage.setItem('selectedTheme', theme);
+  };
 
   // Initialize game
   const initializeGame = () => {
@@ -108,7 +144,7 @@ const MemoryGame = () => {
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: themeStyles.background,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -176,9 +212,9 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                background: isCardVisible(index, card.symbol)
+                  ? themeStyles.background
+                  : themeStyles.cardBack,
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
@@ -212,6 +248,64 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          <div style={{
+            marginBottom: '30px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px',
+            alignItems: 'center'
+          }}>
+            <h2 style={{
+              color: 'white',
+              margin: '0',
+              fontSize: '24px'
+            }}>
+              Select Theme
+            </h2>
+            <div style={{
+              display: 'flex',
+              gap: '15px'
+            }}>
+              {Object.keys(themes).map(theme => (
+                <button
+                  key={theme}
+                  onClick={() => handleThemeChange(theme)}
+                  style={{
+                    padding: '15px 30px',
+                    fontSize: '18px',
+                    background: selectedTheme === theme ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                    border: '2px solid white',
+                    borderRadius: '50px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: selectedTheme === theme ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedTheme !== theme) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.3)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedTheme !== theme) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                    }
+                  }}
+                >
+                  {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div style={{
+              display: 'flex',
+              gap: '10px',
+              marginTop: '10px'
+            }}>
+              {themes[selectedTheme].map((symbol, index) => (
+                <span key={index} style={{ fontSize: '24px' }}>{symbol}</span>
+              ))}
+            </div>
+          </div>
           <button
             onClick={initializeGame}
             style={{
