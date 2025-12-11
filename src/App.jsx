@@ -8,13 +8,10 @@ const CardBack = () => (
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    fontSize: '48px',
+    color: 'red',
   }}>
-    <div style={{
-      width: '60%',
-      height: '60%',
-      background: 'red',
-      transform: 'rotate(45deg)',
-    }} />
+    ♦️
   </div>
 );
 
