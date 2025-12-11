@@ -10,12 +10,75 @@ const MemoryGame = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameLost, setGameLost] = useState(false);
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Theme definitions
+  const themes = {
+    space: {
+      name: 'Space',
+      symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'],
+      gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      accent: '#667eea'
+    },
+    animals: {
+      name: 'Animals',
+      symbols: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'],
+      gradient: 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)',
+      accent: '#2ecc71'
+    },
+    food: {
+      name: 'Food',
+      symbols: ['🍕', '🍔', '🍟', '🌭', '🍿', '🥐', '🥨', '🥯'],
+      gradient: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
+      accent: '#e74c3c'
+    }
+  };
+
+  const [currentTheme, setCurrentTheme] = useState('space');
+  const cardSymbols = themes[currentTheme].symbols;
+
+  // Difficulty levels
+  const difficulties = {
+    easy: {
+      name: 'Easy',
+      gridSize: 6,
+      grid: '3 x 2'
+    },
+    medium: {
+      name: 'Medium',
+      gridSize: 16,
+      grid: '4 x 4'
+    },
+    hard: {
+      name: 'Hard',
+      gridSize: 24,
+      grid: '6 x 4'
+    }
+  };
+
+  const [currentDifficulty, setCurrentDifficulty] = useState('medium');
+  const [highScore, setHighScore] = useState(() => {
+    const saved = localStorage.getItem('highScore');
+    return saved !== null ? JSON.parse(saved) : {
+      easy: { moves: Infinity, time: Infinity },
+      medium: { moves: Infinity, time: Infinity },
+      hard: { moves: Infinity, time: Infinity }
+    };
+  });
+
+  // Update high score
+  const updateHighScore = (moves, time) => {
+    const diffScore = highScore[currentDifficulty];
+    if (moves < diffScore.moves || (moves === diffScore.moves && time < diffScore.time)) {
+      const newHighScore = { ...highScore, [currentDifficulty]: { moves, time } };
+      setHighScore(newHighScore);
+      localStorage.setItem('highScore', JSON.stringify(newHighScore));
+    }
+  };
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    const gridSize = difficulties[currentDifficulty].gridSize;
+    const shuffledSymbols = [...cardSymbols].sort(() => Math.random() - 0.5).slice(0, gridSize / 2);
+    const shuffledCards = [...shuffledSymbols, ...shuffledSymbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -76,6 +139,7 @@ const MemoryGame = () => {
         // Check if game is won
         if (newMatchedPairs.length === cardSymbols.length) {
           setGameWon(true);
+          updateHighScore(moves + 1, 60 - timeLeft);
         }
       } else {
         // No match, flip back after delay
@@ -97,6 +161,64 @@ const MemoryGame = () => {
     document.body.style.overflow = 'auto';
   }, []);
 
+  // Difficulty Selector Component
+  const DifficultySelector = () => (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '10px',
+      marginBottom: '20px'
+    }}>
+      {Object.keys(difficulties).map((diff) => (
+        <button
+          key={diff}
+          onClick={() => setCurrentDifficulty(diff)}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            background: currentDifficulty === diff ? themes[currentTheme].accent : 'white',
+            color: currentDifficulty === diff ? 'white' : themes[currentTheme].accent,
+            border: `2px solid ${themes[currentTheme].accent}`,
+            borderRadius: '25px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          {difficulties[diff].name} ({difficulties[diff].grid})
+        </button>
+      ))}
+    </div>
+  );
+
+  // Theme Selector Component
+  const ThemeSelector = () => (
+    <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '10px',
+      marginBottom: '20px'
+    }}>
+      {Object.keys(themes).map((theme) => (
+        <button
+          key={theme}
+          onClick={() => setCurrentTheme(theme)}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            background: currentTheme === theme ? themes[theme].accent : 'white',
+            color: currentTheme === theme ? 'white' : themes[theme].accent,
+            border: `2px solid ${themes[theme].accent}`,
+            borderRadius: '25px',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease'
+          }}
+        >
+          {themes[theme].name}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <div style={{
       position: 'fixed',
@@ -104,7 +226,7 @@ const MemoryGame = () => {
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: themes[currentTheme].gradient,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -135,6 +257,14 @@ const MemoryGame = () => {
         </p>
       </div>
 
+      {/* Theme Selector */}
+      {!gameStarted && (
+        <>
+          <ThemeSelector />
+          <DifficultySelector />
+        </>
+      )}
+
       {/* Stats */}
       {gameStarted && (
         <div style={{
@@ -148,7 +278,8 @@ const MemoryGame = () => {
         }}>
           <div style={{ display: 'flex', gap: '30px' }}>
             <div>Moves: {moves}</div>
-            <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+            <div>Matches: {matchedPairs.length}/{difficulties[currentDifficulty].gridSize / 2}</div>
+            <div>High Score: {highScore[currentDifficulty].moves} moves in {highScore[currentDifficulty].time}s</div>
           </div>
           <div style={{ fontSize: '32px' }}>Time: {timeLeft}s</div>
         </div>
@@ -158,7 +289,11 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: currentDifficulty === 'hard'
+            ? 'repeat(6, 1fr)'
+            : currentDifficulty === 'easy'
+              ? 'repeat(3, 1fr)'
+              : 'repeat(4, 1fr)',
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -173,8 +308,8 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                background: isCardVisible(index, card.symbol)
+                  ? themes[currentTheme].gradient
                   : 'white',
                 borderRadius: '15px',
                 display: 'flex',
