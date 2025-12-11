@@ -7,6 +7,8 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameOver, setGameOver] = useState(false);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -21,18 +23,20 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setTimeLeft(60);
+    setGameOver(false);
   };
 
   // Handle card click
   const handleCardClick = (index) => {
-    if (!gameStarted || gameWon) return;
+    if (!gameStarted || gameWon || gameOver) return;
     if (flippedIndices.length === 2) return;
     if (flippedIndices.includes(index)) return;
     if (matchedPairs.includes(cards[index].symbol)) return;
@@ -43,15 +47,17 @@ const MemoryGame = () => {
     if (newFlippedIndices.length === 2) {
       setMoves(moves + 1);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
-          setTimeout(() => setGameWon(true), 500);
+          setTimeout(() => {
+            setGameWon(true);
+          }, 500);
         }
       } else {
         // No match, flip back after delay
@@ -72,6 +78,18 @@ const MemoryGame = () => {
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
   }, []);
+
+  useEffect(() => {
+    let timer;
+    if (gameStarted && !gameWon && !gameOver && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      setGameOver(true);
+    }
+    return () => clearInterval(timer);
+  }, [gameStarted, gameWon, gameOver, timeLeft]);
 
   return (
     <div style={{
@@ -123,6 +141,15 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div style={{
+            background: timeLeft <= 10 ? 'rgba(255, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.2)',
+            padding: '5px 15px',
+            borderRadius: '25px',
+            border: timeLeft <= 10 ? '2px solid rgba(255, 0, 0, 0.5)' : '2px solid rgba(255, 255, 255, 0.5)',
+            color: timeLeft <= 10 ? '#ff3333' : 'white'
+          }}>
+            Time: {timeLeft}s
+          </div>
         </div>
       )}
 
@@ -145,7 +172,7 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
@@ -234,6 +261,68 @@ const MemoryGame = () => {
         </button>
       )}
 
+      {/* Time's Up Modal */}
+      {gameOver && !gameWon && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '40px',
+            borderRadius: '20px',
+            textAlign: 'center',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              fontSize: '48px',
+              margin: '0 0 20px 0',
+              color: '#667eea'
+            }}>
+              Time's Up!
+            </h2>
+            <p style={{
+              fontSize: '24px',
+              margin: '0 0 30px 0',
+              color: '#333'
+            }}>
+              You ran out of time. Try again!
+            </p>
+            <button
+              onClick={initializeGame}
+              style={{
+                padding: '15px 40px',
+                fontSize: '20px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: 'white',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              Play Again
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Win Modal */}
       {gameWon && (
         <div style={{
@@ -267,7 +356,7 @@ const MemoryGame = () => {
               margin: '0 0 30px 0',
               color: '#333'
             }}>
-              Completed in {moves} moves!
+              Completed in {moves} moves with {timeLeft} seconds left!
             </p>
             <button
               onClick={initializeGame}
