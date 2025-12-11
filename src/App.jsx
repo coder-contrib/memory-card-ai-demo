@@ -7,6 +7,8 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [highScore, setHighScore] = useState(null);
+  const [newHighScore, setNewHighScore] = useState(false);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -21,13 +23,14 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setNewHighScore(false);
   };
 
   // Handle card click
@@ -48,9 +51,14 @@ const MemoryGame = () => {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
+          // Check for new high score
+          if (!highScore || moves + 1 < highScore) {
+            setNewHighScore(true);
+            saveHighScore(moves + 1);
+          }
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -71,7 +79,19 @@ const MemoryGame = () => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
+
+    // Load high score from localStorage
+    const savedHighScore = localStorage.getItem('memoryGameHighScore');
+    if (savedHighScore) {
+      setHighScore(parseInt(savedHighScore, 10));
+    }
   }, []);
+
+  // Function to save high score
+  const saveHighScore = (score) => {
+    localStorage.setItem('memoryGameHighScore', score.toString());
+    setHighScore(score);
+  };
 
   return (
     <div style={{
@@ -123,6 +143,7 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          {highScore && <div>Best: {highScore} moves</div>}
         </div>
       )}
 
@@ -264,11 +285,29 @@ const MemoryGame = () => {
             </h2>
             <p style={{
               fontSize: '24px',
-              margin: '0 0 30px 0',
+              margin: '0 0 10px 0',
               color: '#333'
             }}>
               Completed in {moves} moves!
             </p>
+            {newHighScore ? (
+              <p style={{
+                fontSize: '24px',
+                margin: '0 0 30px 0',
+                color: '#00c853',
+                fontWeight: 'bold'
+              }}>
+                🏆 New High Score! 🏆
+              </p>
+            ) : highScore && (
+              <p style={{
+                fontSize: '18px',
+                margin: '0 0 30px 0',
+                color: '#666'
+              }}>
+                Best: {highScore} moves
+              </p>
+            )}
             <button
               onClick={initializeGame}
               style={{
