@@ -174,11 +174,11 @@ const MemoryGame = () => {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  justifyContent: 'center',
+                  justifyContent: 'space-evenly',
                   height: '100%'
                 }}>
                   <span style={{ color: 'red', fontSize: '24px' }}>♦️</span>
-                  <span style={{ marginTop: '5px' }}>?</span>
+                  <span>?</span>
                 </div>
               )}
             </div>
