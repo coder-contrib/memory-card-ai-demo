@@ -162,14 +162,31 @@ const MemoryGame = () => {
               }}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
-                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.transform = 'scale(1.05) rotateY(10deg)';
+                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.3)';
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.transform = 'scale(1) rotateY(0deg)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  background: 'repeating-linear-gradient(45deg, #4a90e2, #4a90e2 10px, #5ca0ea 10px, #5ca0ea 20px)',
+                  borderRadius: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  color: 'white',
+                  fontWeight: 'bold'
+                }}>
+                  MC
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -287,7 +304,8 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1.05)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.transform = 'scale(1) rotateY(0deg)';
+                e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
               }}
             >
               Play Again
