@@ -7,6 +7,14 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [bestScore, setBestScore] = useState(() => {
+    const savedBestScore = localStorage.getItem('memoryGameBestScore');
+    return savedBestScore ? parseInt(savedBestScore) : Infinity;
+  });
+  const [gamesPlayed, setGamesPlayed] = useState(() => {
+    const savedGamesPlayed = localStorage.getItem('memoryGameGamesPlayed');
+    return savedGamesPlayed ? parseInt(savedGamesPlayed) : 0;
+  });
 
   // Card emojis for the game
   const themes = {
@@ -29,13 +37,18 @@ const cardSymbols = themes[currentTheme];
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+
+    // Increment games played counter
+    const newGamesPlayed = gamesPlayed + 1;
+    setGamesPlayed(newGamesPlayed);
+    localStorage.setItem('memoryGameGamesPlayed', newGamesPlayed.toString());
   };
 
   // Handle card click
@@ -59,7 +72,14 @@ const cardSymbols = themes[currentTheme];
         
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
-          setTimeout(() => setGameWon(true), 500);
+          setTimeout(() => {
+            // Update best score if current score is better
+            if (moves < bestScore) {
+              setBestScore(moves);
+              localStorage.setItem('memoryGameBestScore', moves.toString());
+            }
+            setGameWon(true);
+          }, 500);
         }
       } else {
         // No match, flip back after delay
@@ -132,6 +152,8 @@ const cardSymbols = themes[currentTheme];
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
           <div>Theme: {currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1)}</div>
+          <div>Best: {bestScore === Infinity ? '-' : bestScore} moves</div>
+          <div>Games: {gamesPlayed}</div>
         </div>
       )}
 
@@ -324,10 +346,17 @@ const cardSymbols = themes[currentTheme];
             </h2>
             <p style={{
               fontSize: '24px',
-              margin: '0 0 30px 0',
+              margin: '0 0 15px 0',
               color: '#333'
             }}>
               Completed in {moves} moves!
+            </p>
+            <p style={{
+              fontSize: '20px',
+              margin: '0 0 30px 0',
+              color: '#667eea'
+            }}>
+              {moves === bestScore ? '🏆 New Best Score! 🏆' : `Best score: ${bestScore === Infinity ? '-' : bestScore} moves`}
             </p>
             <button
               onClick={initializeGame}
