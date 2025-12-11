@@ -67,6 +67,22 @@ const MemoryGame = () => {
     return flippedIndices.includes(index) || matchedPairs.includes(symbol);
   };
 
+  const renderCardBack = () => {
+    return (
+      <div style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '48px',
+        color: 'red'
+      }}>
+        ♦
+      </div>
+    );
+  };
+
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
@@ -169,7 +185,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : renderCardBack()}
             </div>
           ))}
         </div>
