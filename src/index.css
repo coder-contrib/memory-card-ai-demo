@@ -1,11 +1,17 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'VT323', monospace;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: #00ffff;
+  background-color: #0a0a1f;
+
+  --neon-pink: #ff00ff;
+  --neon-blue: #00ffff;
+  --neon-purple: #9900ff;
+  --neon-green: #39ff14;
+  --neon-yellow: #ffff00;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,11 +21,14 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: var(--neon-blue);
+  text-decoration: none;
+  text-shadow: 0 0 5px var(--neon-blue);
+  transition: all 0.3s ease;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--neon-pink);
+  text-shadow: 0 0 10px var(--neon-pink);
 }
 
 body {
@@ -28,26 +37,34 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(45deg, #0a0a1f, #1a1a3f);
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  color: var(--neon-purple);
+  text-shadow: 0 0 10px var(--neon-purple);
 }
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 2px solid var(--neon-green);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: transparent;
+  color: var(--neon-green);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s;
+  text-shadow: 0 0 5px var(--neon-green);
+  box-shadow: 0 0 10px var(--neon-green);
 }
 button:hover {
-  border-color: #646cff;
+  background-color: var(--neon-green);
+  color: #0a0a1f;
+  text-shadow: none;
 }
 button:focus,
 button:focus-visible {
@@ -56,13 +73,13 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--neon-blue);
+    background-color: #0a0a1f;
   }
   a:hover {
-    color: #747bff;
+    color: var(--neon-pink);
   }
   button {
-    background-color: #f9f9f9;
+    background-color: transparent;
   }
 }

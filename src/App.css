@@ -12,10 +12,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em var(--neon-blue));
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em var(--neon-purple));
 }
 
 @keyframes logo-spin {
@@ -35,8 +35,47 @@
 
 .card {
   padding: 2em;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .read-the-docs {
-  color: #888;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 5px var(--neon-yellow);
+}
+
+/* Neon text effect */
+.neon-text {
+  animation: neon 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes neon {
+  from {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px var(--neon-blue), 0 0 35px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 50px var(--neon-blue), 0 0 75px var(--neon-blue);
+  }
+  to {
+    text-shadow: 0 0 2.5px #fff, 0 0 5px #fff, 0 0 7.5px #fff, 0 0 10px var(--neon-blue), 0 0 17.5px var(--neon-blue), 0 0 20px var(--neon-blue), 0 0 25px var(--neon-blue), 0 0 37.5px var(--neon-blue);
+  }
+}
+
+/* Grid effect */
+.grid-background {
+  background-image: linear-gradient(var(--neon-purple) 1px, transparent 1px),
+    linear-gradient(90deg, var(--neon-purple) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center center;
+  animation: grid-move 15s linear infinite;
+}
+
+@keyframes grid-move {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 20px 20px;
+  }
 }

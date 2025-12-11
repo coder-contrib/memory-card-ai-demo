@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './App.css';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -8,8 +9,8 @@ const MemoryGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Card emojis for the game - using 80s themed icons
+  const cardSymbols = ['🎮', '📼', '🕹️', '📺', '📟', '💾', '📻', '🪩'];
 
   // Initialize game
   const initializeGame = () => {
@@ -21,7 +22,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -43,12 +44,12 @@ const MemoryGame = () => {
     if (newFlippedIndices.length === 2) {
       setMoves(moves + 1);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
           setTimeout(() => setGameWon(true), 500);
@@ -68,44 +69,56 @@ const MemoryGame = () => {
   };
 
   useEffect(() => {
+    // Load VT323 font for 80s look
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=VT323&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
+
+    // Cleanup
+    return () => {
+      document.head.removeChild(link);
+    };
   }, []);
 
   return (
-    <div style={{
+    <div className="grid-background" style={{
       position: 'fixed',
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(45deg, #0a0a1f, #1a1a3f)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '20px',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: "'VT323', monospace",
       overflow: 'auto'
     }}>
       {/* Header */}
       <div style={{
         textAlign: 'center',
         marginBottom: '30px',
-        color: 'white'
+        color: 'var(--neon-blue)'
       }}>
-        <h1 style={{
-          fontSize: '48px',
+        <h1 className="neon-text" style={{
+          fontSize: '64px',
           margin: '0 0 10px 0',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+          textShadow: '0 0 10px var(--neon-blue)'
         }}>
-          Memory Card Game
+          R E T R O  M E M O R Y
         </h1>
         <p style={{
-          fontSize: '18px',
+          fontSize: '22px',
           margin: '0',
-          opacity: 0.9
+          opacity: 0.9,
+          color: 'var(--neon-pink)'
         }}>
           Match all the pairs to win!
         </p>
@@ -117,9 +130,10 @@ const MemoryGame = () => {
           display: 'flex',
           gap: '30px',
           marginBottom: '30px',
-          fontSize: '24px',
-          color: 'white',
-          fontWeight: 'bold'
+          fontSize: '28px',
+          color: 'var(--neon-green)',
+          fontWeight: 'bold',
+          textShadow: '0 0 5px var(--neon-green)'
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
@@ -128,15 +142,13 @@ const MemoryGame = () => {
 
       {/* Game Board */}
       {gameStarted ? (
-        <div style={{
+        <div className="card" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
           gap: '15px',
           padding: '20px',
-          background: 'rgba(255, 255, 255, 0.1)',
           borderRadius: '20px',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+          boxShadow: '0 0 20px var(--neon-purple)'
         }}>
           {cards.map((card, index) => (
             <div
@@ -145,28 +157,38 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                background: isCardVisible(index, card.symbol)
+                  ? 'rgba(255, 255, 255, 0.1)'
+                  : 'rgba(0, 0, 0, 0.5)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '48px',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
-                transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                transform: isCardVisible(index, card.symbol) ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                transition: 'all 0.5s ease',
+                transformStyle: 'preserve-3d',
+                boxShadow: isCardVisible(index, card.symbol)
+                  ? '0 0 15px var(--neon-blue)'
+                  : '0 0 10px var(--neon-purple)',
+                border: isCardVisible(index, card.symbol)
+                  ? '2px solid var(--neon-blue)'
+                  : '2px solid var(--neon-purple)',
                 userSelect: 'none',
                 opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
               }}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
-                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 0 20px var(--neon-pink)';
+                  e.currentTarget.style.transform = 'scale(1.05) rotateY(0deg)';
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
+                if (!isCardVisible(index, card.symbol)) {
+                  e.currentTarget.style.boxShadow = '0 0 10px var(--neon-purple)';
+                  e.currentTarget.style.transform = 'scale(1) rotateY(0deg)';
+                }
               }}
             >
               {isCardVisible(index, card.symbol) ? card.symbol : '?'}
@@ -181,23 +203,26 @@ const MemoryGame = () => {
             onClick={initializeGame}
             style={{
               padding: '20px 40px',
-              fontSize: '24px',
-              background: 'white',
-              border: 'none',
+              fontSize: '28px',
+              background: 'transparent',
+              border: '2px solid var(--neon-green)',
               borderRadius: '50px',
               cursor: 'pointer',
               fontWeight: 'bold',
-              color: '#667eea',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+              color: 'var(--neon-green)',
+              boxShadow: '0 0 15px var(--neon-green)',
+              textShadow: '0 0 5px var(--neon-green)',
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+              e.currentTarget.style.boxShadow = '0 0 25px var(--neon-green)';
+              e.currentTarget.style.textShadow = '0 0 10px var(--neon-green)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+              e.currentTarget.style.boxShadow = '0 0 15px var(--neon-green)';
+              e.currentTarget.style.textShadow = '0 0 5px var(--neon-green)';
             }}
           >
             Start Game
@@ -212,22 +237,26 @@ const MemoryGame = () => {
           style={{
             marginTop: '30px',
             padding: '12px 30px',
-            fontSize: '18px',
-            background: 'rgba(255, 255, 255, 0.2)',
-            border: '2px solid white',
+            fontSize: '22px',
+            background: 'transparent',
+            border: '2px solid var(--neon-yellow)',
             borderRadius: '50px',
             cursor: 'pointer',
             fontWeight: 'bold',
-            color: 'white',
+            color: 'var(--neon-yellow)',
+            boxShadow: '0 0 10px var(--neon-yellow)',
+            textShadow: '0 0 5px var(--neon-yellow)',
             transition: 'all 0.3s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'white';
-            e.currentTarget.style.color = '#667eea';
+            e.currentTarget.style.background = 'var(--neon-yellow)';
+            e.currentTarget.style.color = '#0a0a1f';
+            e.currentTarget.style.textShadow = 'none';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-            e.currentTarget.style.color = 'white';
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'var(--neon-yellow)';
+            e.currentTarget.style.textShadow = '0 0 5px var(--neon-yellow)';
           }}
         >
           Reset Game
@@ -246,26 +275,28 @@ const MemoryGame = () => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1000
+          zIndex: 1000,
+          backdropFilter: 'blur(5px)'
         }}>
-          <div style={{
-            background: 'white',
+          <div className="card" style={{
+            background: 'rgba(10, 10, 31, 0.8)',
             padding: '40px',
             borderRadius: '20px',
             textAlign: 'center',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+            boxShadow: '0 0 30px var(--neon-pink)',
+            border: '2px solid var(--neon-pink)'
           }}>
-            <h2 style={{
+            <h2 className="neon-text" style={{
               fontSize: '48px',
               margin: '0 0 20px 0',
-              color: '#667eea'
+              color: 'var(--neon-pink)'
             }}>
-              🎉 You Won! 🎉
+              YOU WIN!
             </h2>
             <p style={{
-              fontSize: '24px',
+              fontSize: '28px',
               margin: '0 0 30px 0',
-              color: '#333'
+              color: 'var(--neon-blue)'
             }}>
               Completed in {moves} moves!
             </p>
@@ -273,21 +304,28 @@ const MemoryGame = () => {
               onClick={initializeGame}
               style={{
                 padding: '15px 40px',
-                fontSize: '20px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                border: 'none',
+                fontSize: '24px',
+                background: 'transparent',
+                border: '2px solid var(--neon-green)',
                 borderRadius: '50px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                color: 'white',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                color: 'var(--neon-green)',
+                boxShadow: '0 0 15px var(--neon-green)',
+                textShadow: '0 0 5px var(--neon-green)',
                 transition: 'all 0.3s ease'
               }}
               onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'var(--neon-green)';
+                e.currentTarget.style.color = '#0a0a1f';
                 e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.textShadow = 'none';
               }}
               onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = 'var(--neon-green)';
                 e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.textShadow = '0 0 5px var(--neon-green)';
               }}
             >
               Play Again
