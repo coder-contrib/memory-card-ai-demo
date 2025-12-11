@@ -10,6 +10,8 @@ const MemoryGame = () => {
   const [bestScore, setBestScore] = useState(Infinity);
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const [currentTheme, setCurrentTheme] = useState('Emoji');
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameOver, setGameOver] = useState(false);
 
   // Load saved scores from localStorage
   useEffect(() => {
@@ -18,6 +20,24 @@ const MemoryGame = () => {
     if (savedBestScore) setBestScore(parseInt(savedBestScore));
     if (savedGamesPlayed) setGamesPlayed(parseInt(savedGamesPlayed));
   }, []);
+
+  // Countdown timer logic
+  useEffect(() => {
+    let timer;
+    if (gameStarted && !gameWon && !gameOver && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            setGameOver(true);
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [gameStarted, gameWon, gameOver, timeLeft]);
 
   // Theme symbols
   const themes = {
@@ -43,6 +63,8 @@ const MemoryGame = () => {
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setGameOver(false);
+    setTimeLeft(60);
     setGamesPlayed(prevGames => {
       const newGamesPlayed = prevGames + 1;
       localStorage.setItem('gamesPlayed', newGamesPlayed.toString());
@@ -52,7 +74,7 @@ const MemoryGame = () => {
 
   // Handle card click
   const handleCardClick = (index) => {
-    if (!gameStarted || gameWon) return;
+    if (!gameStarted || gameWon || gameOver) return;
     if (flippedIndices.length === 2) return;
     if (flippedIndices.includes(index)) return;
     if (matchedPairs.includes(cards[index].symbol)) return;
@@ -113,6 +135,25 @@ const MemoryGame = () => {
       fontFamily: 'Arial, sans-serif',
       overflow: 'auto'
     }}>
+      {/* Timer */}
+      {gameStarted && !gameOver && !gameWon && (
+        <div style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          background: 'rgba(255, 255, 255, 0.2)',
+          borderRadius: '15px',
+          padding: '10px 20px',
+          color: timeLeft <= 10 ? '#FF3A33' : 'white',
+          fontWeight: 'bold',
+          fontSize: '28px',
+          boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+          transition: 'all 0.3s ease',
+          animation: timeLeft <= 10 ? 'pulse 1s infinite' : 'none'
+        }}>
+          ⏱️ {timeLeft}s
+        </div>
+      )}
       {/* Header */}
       <div style={{
         textAlign: 'center',
@@ -318,6 +359,68 @@ const MemoryGame = () => {
         >
           Reset Game
         </button>
+      )}
+
+      {/* Time's Up Modal */}
+      {gameOver && !gameWon && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '40px',
+            borderRadius: '20px',
+            textAlign: 'center',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              fontSize: '48px',
+              margin: '0 0 20px 0',
+              color: '#FF3A33'
+            }}>
+              ⏰ Time's Up! ⏰
+            </h2>
+            <p style={{
+              fontSize: '24px',
+              margin: '0 0 30px 0',
+              color: '#333'
+            }}>
+              You ran out of time!
+            </p>
+            <button
+              onClick={initializeGame}
+              style={{
+                padding: '15px 40px',
+                fontSize: '20px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: 'white',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              Play Again
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Win Modal */}
