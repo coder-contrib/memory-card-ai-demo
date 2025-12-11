@@ -145,9 +145,14 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
+                backgroundImage: !isCardVisible(index, card.symbol)
+                  ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cpath fill='red' d='M20 0 L40 20 L20 40 L0 20 Z'/%3E%3C/svg%3E\")"
+                  : 'none',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
@@ -169,7 +174,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : ''}
             </div>
           ))}
         </div>
