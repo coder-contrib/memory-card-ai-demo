@@ -32,6 +32,13 @@ const MemoryGame = () => {
   const [currentTheme, setCurrentTheme] = useState('space');
   const cardSymbols = themes[currentTheme].symbols;
 
+  // Reset game when theme changes
+  useEffect(() => {
+    if (gameStarted) {
+      initializeGame();
+    }
+  }, [currentTheme]);
+
   // Initialize game
   const initializeGame = () => {
     const shuffledCards = [...cardSymbols, ...cardSymbols]
@@ -158,12 +165,7 @@ const MemoryGame = () => {
         {Object.keys(themes).map(themeKey => (
           <button
             key={themeKey}
-            onClick={() => {
-              setCurrentTheme(themeKey);
-              if (gameStarted) {
-                initializeGame();
-              }
-            }}
+            onClick={() => setCurrentTheme(themeKey)}
             style={{
               padding: '8px 15px',
               background: currentTheme === themeKey
