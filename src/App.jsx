@@ -117,32 +117,33 @@ const MemoryGame = () => {
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: '#F5F5F5',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '20px',
-      fontFamily: 'Arial, sans-serif',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       overflow: 'auto'
     }}>
       {/* Header */}
       <div style={{
         textAlign: 'center',
         marginBottom: '30px',
-        color: 'white'
+        color: '#3A3A3A'
       }}>
         <h1 style={{
-          fontSize: '48px',
+          fontSize: '36px',
+          fontWeight: '600',
           margin: '0 0 10px 0',
-          textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+          letterSpacing: '-0.5px'
         }}>
           Memory Card Game
         </h1>
         <p style={{
-          fontSize: '18px',
+          fontSize: '16px',
           margin: '0',
-          opacity: 0.9
+          opacity: 0.8
         }}>
           Match all the pairs to win!
         </p>
@@ -160,14 +161,14 @@ const MemoryGame = () => {
               key={key}
               onClick={() => setTheme(key)}
               style={{
-                padding: '10px 20px',
-                fontSize: '16px',
-                background: theme === key ? 'white' : 'rgba(255, 255, 255, 0.2)',
-                border: '2px solid white',
-                borderRadius: '50px',
+                padding: '8px 16px',
+                fontSize: '14px',
+                background: theme === key ? '#4A90E2' : '#FFFFFF',
+                border: '1px solid #4A90E2',
+                borderRadius: '4px',
                 cursor: 'pointer',
-                fontWeight: 'bold',
-                color: theme === key ? '#667eea' : 'white',
+                fontWeight: '500',
+                color: theme === key ? '#FFFFFF' : '#4A90E2',
                 transition: 'all 0.3s ease'
               }}
             >
@@ -181,11 +182,11 @@ const MemoryGame = () => {
       {gameStarted && (
         <div style={{
           display: 'flex',
-          gap: '30px',
-          marginBottom: '30px',
-          fontSize: '24px',
-          color: 'white',
-          fontWeight: 'bold'
+          gap: '20px',
+          marginBottom: '20px',
+          fontSize: '16px',
+          color: '#3A3A3A',
+          fontWeight: '500'
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{getCardSymbols().length}</div>
@@ -198,45 +199,49 @@ const MemoryGame = () => {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '15px',
+          gap: '12px',
           padding: '20px',
-          background: 'rgba(255, 255, 255, 0.1)',
-          borderRadius: '20px',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+          background: '#FFFFFF',
+          borderRadius: '8px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
         }}>
           {cards.map((card, index) => (
             <div
               key={card.id}
               onClick={() => handleCardClick(index)}
               style={{
-                width: '100px',
-                height: '100px',
-                background: isCardVisible(index, card.symbol) 
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
-                borderRadius: '15px',
+                width: '80px',
+                height: '80px',
+                background: isCardVisible(index, card.symbol)
+                  ? '#4A90E2'
+                  : '#FFFFFF',
+                border: '1px solid #E0E0E0',
+                borderRadius: '4px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: '32px',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
-                transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                boxShadow: isCardVisible(index, card.symbol) ? '0 2px 4px rgba(0, 0, 0, 0.1)' : 'none',
                 userSelect: 'none',
-                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
+                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1,
+                transform: isCardVisible(index, card.symbol) ? 'rotateY(180deg)' : 'rotateY(0deg)'
               }}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
-                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(74, 144, 226, 0.2)';
+                  e.currentTarget.style.borderColor = '#4A90E2';
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
+                if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.borderColor = '#E0E0E0';
+                }
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : ''}
             </div>
           ))}
         </div>
@@ -247,24 +252,23 @@ const MemoryGame = () => {
           <button
             onClick={initializeGame}
             style={{
-              padding: '20px 40px',
-              fontSize: '24px',
-              background: 'white',
+              padding: '12px 24px',
+              fontSize: '16px',
+              background: '#4A90E2',
               border: 'none',
-              borderRadius: '50px',
+              borderRadius: '4px',
               cursor: 'pointer',
-              fontWeight: 'bold',
-              color: '#667eea',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+              fontWeight: '500',
+              color: '#FFFFFF',
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+              e.currentTarget.style.background = '#3A7BC8';
+              e.currentTarget.style.transform = 'translateY(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+              e.currentTarget.style.background = '#4A90E2';
+              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             Start Game
@@ -277,24 +281,24 @@ const MemoryGame = () => {
         <button
           onClick={initializeGame}
           style={{
-            marginTop: '30px',
-            padding: '12px 30px',
-            fontSize: '18px',
-            background: 'rgba(255, 255, 255, 0.2)',
-            border: '2px solid white',
-            borderRadius: '50px',
+            marginTop: '20px',
+            padding: '8px 16px',
+            fontSize: '14px',
+            background: '#FFFFFF',
+            border: '1px solid #4A90E2',
+            borderRadius: '4px',
             cursor: 'pointer',
-            fontWeight: 'bold',
-            color: 'white',
+            fontWeight: '500',
+            color: '#4A90E2',
             transition: 'all 0.3s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'white';
-            e.currentTarget.style.color = '#667eea';
+            e.currentTarget.style.background = '#4A90E2';
+            e.currentTarget.style.color = '#FFFFFF';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
-            e.currentTarget.style.color = 'white';
+            e.currentTarget.style.background = '#FFFFFF';
+            e.currentTarget.style.color = '#4A90E2';
           }}
         >
           Reset Game
@@ -309,52 +313,46 @@ const MemoryGame = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'rgba(0,0,0,0.8)',
+          background: 'rgba(0, 0, 0, 0.5)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 1000
         }}>
           <div style={{
-            background: 'white',
+            background: '#FFFFFF',
             padding: '40px',
-            borderRadius: '20px',
+            borderRadius: '8px',
             textAlign: 'center',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
           }}>
             <h2 style={{
-              fontSize: '48px',
+              fontSize: '24px',
+              fontWeight: '600',
               margin: '0 0 20px 0',
-              color: '#667eea'
+              color: '#3A3A3A'
             }}>
-              🎉 You Won! 🎉
+              Congratulations!
             </h2>
             <p style={{
-              fontSize: '24px',
+              fontSize: '16px',
               margin: '0 0 30px 0',
-              color: '#333'
+              color: '#3A3A3A'
             }}>
-              Completed in {moves} moves!
+              You won in {moves} moves!
             </p>
             <button
               onClick={initializeGame}
               style={{
-                padding: '15px 40px',
-                fontSize: '20px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                padding: '12px 24px',
+                fontSize: '16px',
+                background: '#4A90E2',
                 border: 'none',
-                borderRadius: '50px',
+                borderRadius: '4px',
                 cursor: 'pointer',
-                fontWeight: 'bold',
-                color: 'white',
-                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                fontWeight: '500',
+                color: '#FFFFFF',
                 transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
               }}
             >
               Play Again
