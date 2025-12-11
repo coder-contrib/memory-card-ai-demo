@@ -139,15 +139,18 @@ const MemoryGame = () => {
       {gameStarted && (
         <div style={{
           display: 'flex',
-          gap: '30px',
+          justifyContent: 'space-between',
+          width: '100%',
           marginBottom: '30px',
           fontSize: '24px',
           color: 'white',
           fontWeight: 'bold'
         }}>
-          <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
-          <div>Time: {timeLeft}s</div>
+          <div style={{ display: 'flex', gap: '30px' }}>
+            <div>Moves: {moves}</div>
+            <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          </div>
+          <div style={{ fontSize: '32px' }}>Time: {timeLeft}s</div>
         </div>
       )}
 
@@ -354,13 +357,10 @@ const MemoryGame = () => {
               margin: '0 0 30px 0',
               color: '#333'
             }}>
-              You matched {matchedPairs.length}/{cardSymbols.length} pairs in {moves} moves.
+              Time's Up! You ran out of time.
             </p>
             <button
-              onClick={() => {
-                setGameLost(false);
-                setGameStarted(false);
-              }}
+              onClick={initializeGame}
               style={{
                 padding: '15px 40px',
                 fontSize: '20px',
@@ -380,7 +380,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              Return to Start
+              Play Again
             </button>
           </div>
         </div>
