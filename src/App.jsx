@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -7,6 +7,9 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameOver, setGameOver] = useState(false);
+  const timerRef = useRef(null);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -21,18 +24,20 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setGameOver(false);
+    setTimeLeft(60);
   };
 
   // Handle card click
   const handleCardClick = (index) => {
-    if (!gameStarted || gameWon) return;
+    if (!gameStarted || gameWon || gameOver) return;
     if (flippedIndices.length === 2) return;
     if (flippedIndices.includes(index)) return;
     if (matchedPairs.includes(cards[index].symbol)) return;
@@ -72,6 +77,24 @@ const MemoryGame = () => {
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
   }, []);
+
+  useEffect(() => {
+    if (gameStarted && !gameWon && !gameOver && timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timerRef.current);
+            setGameOver(true);
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    } else if (gameWon || gameOver || timeLeft === 0) {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [gameStarted, gameWon, gameOver, timeLeft]);
 
   return (
     <div style={{
@@ -123,11 +146,12 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Time: {timeLeft}s</div>
         </div>
       )}
 
       {/* Game Board */}
-      {gameStarted ? (
+      {gameStarted && !gameOver ? (
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
@@ -291,6 +315,68 @@ const MemoryGame = () => {
               }}
             >
               Play Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Time's Up Modal */}
+      {gameOver && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '40px',
+            borderRadius: '20px',
+            textAlign: 'center',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              fontSize: '48px',
+              margin: '0 0 20px 0',
+              color: '#667eea'
+            }}>
+              ⌛ Time's Up! ⌛
+            </h2>
+            <p style={{
+              fontSize: '24px',
+              margin: '0 0 30px 0',
+              color: '#333'
+            }}>
+              You matched {matchedPairs.length} pairs in {moves} moves
+            </p>
+            <button
+              onClick={initializeGame}
+              style={{
+                padding: '15px 40px',
+                fontSize: '20px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: 'white',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              Try Again
             </button>
           </div>
         </div>
