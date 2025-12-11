@@ -145,31 +145,35 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
+                  : 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)',
                 borderRadius: '15px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '48px',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
-                transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
-                transition: 'all 0.3s ease',
+                transform: isCardVisible(index, card.symbol) ? 'rotateY(0deg)' : 'rotateY(180deg)',
+                transition: 'all 0.6s ease',
                 boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
                 userSelect: 'none',
-                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
+                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1,
+                backfaceVisibility: 'hidden',
+                perspective: '1000px'
               }}
               onMouseEnter={(e) => {
                 if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
-                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.transform = 'rotateY(180deg) scale(1.05)';
                 }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
+                if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
+                  e.currentTarget.style.transform = 'rotateY(180deg) scale(1)';
+                }
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : '🃏'}
             </div>
           ))}
         </div>
