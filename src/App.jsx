@@ -7,6 +7,8 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameOver, setGameOver] = useState(false);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -21,13 +23,15 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setTimeLeft(60);
+    setGameOver(false);
   };
 
   // Handle card click
@@ -72,6 +76,25 @@ const MemoryGame = () => {
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
   }, []);
+
+  // Timer countdown effect
+  useEffect(() => {
+    let timerInterval;
+    if (gameStarted && !gameWon && !gameOver && timeLeft > 0) {
+      timerInterval = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+            setGameOver(true);
+            setGameStarted(false);
+            clearInterval(timerInterval);
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timerInterval);
+  }, [gameStarted, gameWon, gameOver]);
 
   return (
     <div style={{
@@ -123,11 +146,12 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Time: <span style={{ color: timeLeft < 10 ? '#ff5555' : 'white' }}>{timeLeft}s</span></div>
         </div>
       )}
 
       {/* Game Board */}
-      {gameStarted ? (
+      {gameStarted && !gameOver ? (
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, 1fr)',
@@ -169,7 +193,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : '♦️'}
             </div>
           ))}
         </div>
@@ -177,36 +201,57 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
-          <button
-            onClick={initializeGame}
-            style={{
-              padding: '20px 40px',
-              fontSize: '24px',
-              background: 'white',
-              border: 'none',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              color: '#667eea',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
-            }}
-          >
-            Start Game
-          </button>
+          {gameOver ? (
+            <div>
+              <h2 style={{
+                fontSize: '48px',
+                margin: '0 0 20px 0',
+                color: 'white',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+              }}>
+                Time's Up!
+              </h2>
+              <p style={{
+                fontSize: '24px',
+                margin: '0 0 30px 0',
+                color: 'white',
+                opacity: 0.9
+              }}>
+                You matched {matchedPairs.length} pairs in {moves} moves.
+              </p>
+            </div>
+          ) : (
+            <button
+              onClick={initializeGame}
+              style={{
+                padding: '20px 40px',
+                fontSize: '24px',
+                background: 'white',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: '#667eea',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+              }}
+            >
+              Start Game
+            </button>
+          )}
         </div>
       )}
 
       {/* Reset Button */}
-      {gameStarted && (
+      {(gameStarted || gameOver) && (
         <button
           onClick={initializeGame}
           style={{
@@ -230,7 +275,7 @@ const MemoryGame = () => {
             e.currentTarget.style.color = 'white';
           }}
         >
-          Reset Game
+          {gameOver ? 'Play Again' : 'Reset Game'}
         </button>
       )}
 
