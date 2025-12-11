@@ -7,13 +7,30 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [difficulty, setDifficulty] = useState('4x4');
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Card emojis for the game (expanded for larger grids)
+  const allCardSymbols = [
+    '🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', // Original 8 symbols
+    '🔥', '🌊', '🌪️', '❄️', '🌍', '🌈', '☀️', '🌧️', // 8 more for 6x6
+    '🦊', '🐰', '🐶', '🐱', '🦁', '🐯', '🐺', '🦄', // 8 more for 8x8
+    '🍎', '🍌', '🍇', '🍓', '🍉', '🍒', '🥭', '🍍' // 8 more as backup
+  ];
+
+  // Get card symbols based on difficulty
+  const getCardSymbols = () => {
+    switch (difficulty) {
+      case '4x4': return allCardSymbols.slice(0, 8);
+      case '6x6': return allCardSymbols.slice(0, 18);
+      case '8x8': return allCardSymbols.slice(0, 32);
+      default: return allCardSymbols.slice(0, 8);
+    }
+  };
 
   // Initialize game
   const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+    const symbols = getCardSymbols();
+    const shuffledCards = [...symbols, ...symbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -21,7 +38,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -48,9 +65,10 @@ const MemoryGame = () => {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
-        if (matchedPairs.length + 1 === cardSymbols.length) {
+        const symbols = getCardSymbols();
+        if (matchedPairs.length + 1 === symbols.length) {
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -122,7 +140,7 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{getCardSymbols().length}</div>
         </div>
       )}
 
@@ -130,7 +148,7 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${difficulty === '4x4' ? 4 : difficulty === '6x6' ? 6 : 8}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -143,8 +161,8 @@ const MemoryGame = () => {
               key={card.id}
               onClick={() => handleCardClick(index)}
               style={{
-                width: '100px',
-                height: '100px',
+                width: `${difficulty === '4x4' ? 100 : difficulty === '6x6' ? 80 : 60}px`,
+                height: `${difficulty === '4x4' ? 100 : difficulty === '6x6' ? 80 : 60}px`,
                 background: isCardVisible(index, card.symbol) 
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
@@ -152,7 +170,7 @@ const MemoryGame = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: `${difficulty === '4x4' ? 48 : difficulty === '6x6' ? 38 : 28}px`,
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
@@ -179,6 +197,32 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          <div style={{
+            marginBottom: '20px',
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '10px'
+          }}>
+            {['4x4', '6x6', '8x8'].map((level) => (
+              <button
+                key={level}
+                onClick={() => setDifficulty(level)}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '18px',
+                  background: difficulty === level ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                  border: '2px solid white',
+                  borderRadius: '50px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  color: difficulty === level ? '#667eea' : 'white',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                {level}
+              </button>
+            ))}
+          </div>
           <button
             onClick={initializeGame}
             style={{
