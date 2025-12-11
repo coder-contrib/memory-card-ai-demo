@@ -1,5 +1,23 @@
 import React, { useState, useEffect } from 'react';
 
+const CardBack = () => (
+  <div style={{
+    width: '100%',
+    height: '100%',
+    background: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}>
+    <div style={{
+      width: '60%',
+      height: '60%',
+      background: 'red',
+      transform: 'rotate(45deg)',
+    }} />
+  </div>
+);
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -169,7 +187,7 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : <CardBack />}
             </div>
           ))}
         </div>
