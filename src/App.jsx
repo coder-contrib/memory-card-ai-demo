@@ -8,8 +8,29 @@ const MemoryGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Theme definitions
+  const themes = {
+    space: {
+      name: 'Space',
+      symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌']
+    },
+    animals: {
+      name: 'Animals',
+      symbols: ['🐶', '🐱', '🐼', '🐨', '🦊', '🦁', '🐯', '🐸']
+    },
+    fruits: {
+      name: 'Fruits',
+      symbols: ['🍎', '🍌', '🍇', '🍊', '🍓', '🍑', '🥝', '🥭']
+    },
+    flags: {
+      name: 'Flags',
+      symbols: ['🇺🇸', '🇨🇦', '🇬🇧', '🇫🇷', '🇩🇪', '🇮🇹', '🇯🇵', '🇦🇺']
+    }
+  };
+
+  // Currently selected theme
+  const [currentTheme, setCurrentTheme] = useState('space');
+  const cardSymbols = themes[currentTheme].symbols;
 
   // Initialize game
   const initializeGame = () => {
@@ -125,6 +146,45 @@ const MemoryGame = () => {
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
         </div>
       )}
+
+      {/* Theme Selector */}
+      <div style={{
+        display: 'flex',
+        gap: '10px',
+        marginBottom: gameStarted ? '20px' : '30px',
+        flexWrap: 'wrap',
+        justifyContent: 'center'
+      }}>
+        {Object.keys(themes).map(themeKey => (
+          <button
+            key={themeKey}
+            onClick={() => {
+              setCurrentTheme(themeKey);
+              if (gameStarted) {
+                initializeGame();
+              }
+            }}
+            style={{
+              padding: '8px 15px',
+              background: currentTheme === themeKey
+                ? 'white'
+                : 'rgba(255, 255, 255, 0.2)',
+              border: '2px solid white',
+              borderRadius: '20px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              color: currentTheme === themeKey ? '#667eea' : 'white',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px'
+            }}
+          >
+            <span>{themes[themeKey].symbols[0]}</span>
+            <span>{themes[themeKey].name}</span>
+          </button>
+        ))}
+      </div>
 
       {/* Game Board */}
       {gameStarted ? (
