@@ -178,7 +178,7 @@ const cardSymbols = themes[currentTheme];
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : <span style={{ color: 'red', fontSize: '60px' }}>♦</span>}
             </div>
           ))}
         </div>
