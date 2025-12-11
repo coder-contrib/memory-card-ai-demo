@@ -174,14 +174,14 @@ const MemoryGame = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#ff0000',
+                  color: '#0066ff',
                   fontSize: '60px',
                   fontWeight: 'bold',
                   width: '80%',
                   height: '80%',
-                  backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                  backgroundColor: 'rgba(0, 102, 255, 0.1)',
                   borderRadius: '10px',
-                  boxShadow: 'inset 0 0 5px rgba(255, 0, 0, 0.3)'
+                  boxShadow: 'inset 0 0 5px rgba(0, 102, 255, 0.3)'
                 }}>♦</div>
               )}
             </div>
