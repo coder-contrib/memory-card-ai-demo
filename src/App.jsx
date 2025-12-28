@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
+const themes = {
+  space: { name: 'Space', symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'] },
+  animals: { name: 'Animals', symbols: ['🐶', '🐱', '🐼', '🦊', '🐰', '🦁', '🐸', '🐵'] },
+  flags: { name: 'Flags', symbols: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺'] }
+};
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -7,13 +13,14 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState('space');
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  const cardSymbols = themes[selectedTheme].symbols;
 
   // Initialize game
-  const initializeGame = () => {
-    const shuffledCards = [...cardSymbols, ...cardSymbols]
+  const initializeGame = (themeKey = selectedTheme) => {
+    const symbols = themes[themeKey].symbols;
+    const shuffledCards = [...symbols, ...symbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
         id: index,
@@ -109,6 +116,36 @@ const MemoryGame = () => {
         }}>
           Match all the pairs to win!
         </p>
+      </div>
+
+      {/* Theme Selector */}
+      <div style={{
+        display: 'flex',
+        gap: '10px',
+        marginBottom: '20px'
+      }}>
+        {Object.entries(themes).map(([key, theme]) => (
+          <button
+            key={key}
+            onClick={() => {
+              setSelectedTheme(key);
+              if (gameStarted) initializeGame(key);
+            }}
+            style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              background: selectedTheme === key ? 'white' : 'rgba(255, 255, 255, 0.2)',
+              border: '2px solid white',
+              borderRadius: '25px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              color: selectedTheme === key ? '#667eea' : 'white',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            {theme.symbols[0]} {theme.name}
+          </button>
+        ))}
       </div>
 
       {/* Stats */}
