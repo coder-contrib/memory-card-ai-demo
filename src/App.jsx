@@ -7,12 +7,24 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [difficulty, setDifficulty] = useState('medium');
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // All available card emojis
+  const allCardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', '🔥', '💎', '🎯', '🎨'];
+
+  // Difficulty configurations
+  const difficultyConfig = {
+    easy: { pairs: 4, columns: 4, label: 'Easy' },
+    medium: { pairs: 8, columns: 4, label: 'Medium' },
+    hard: { pairs: 12, columns: 6, label: 'Hard' }
+  };
+
+  // Get card symbols based on difficulty
+  const getCardSymbols = () => allCardSymbols.slice(0, difficultyConfig[difficulty].pairs);
 
   // Initialize game
   const initializeGame = () => {
+    const cardSymbols = getCardSymbols();
     const shuffledCards = [...cardSymbols, ...cardSymbols]
       .sort(() => Math.random() - 0.5)
       .map((symbol, index) => ({
@@ -32,6 +44,7 @@ const MemoryGame = () => {
 
   // Handle card click
   const handleCardClick = (index) => {
+    const cardSymbols = getCardSymbols();
     if (!gameStarted || gameWon) return;
     if (flippedIndices.length === 2) return;
     if (flippedIndices.includes(index)) return;
@@ -122,7 +135,7 @@ const MemoryGame = () => {
           fontWeight: 'bold'
         }}>
           <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div>Matches: {matchedPairs.length}/{difficultyConfig[difficulty].pairs}</div>
         </div>
       )}
 
@@ -130,7 +143,7 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${difficultyConfig[difficulty].columns}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -177,6 +190,44 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          {/* Difficulty Selector */}
+          <div style={{
+            marginBottom: '30px'
+          }}>
+            <p style={{
+              color: 'white',
+              fontSize: '20px',
+              marginBottom: '15px',
+              fontWeight: 'bold'
+            }}>
+              Select Difficulty
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '15px',
+              justifyContent: 'center'
+            }}>
+              {Object.entries(difficultyConfig).map(([key, config]) => (
+                <button
+                  key={key}
+                  onClick={() => setDifficulty(key)}
+                  style={{
+                    padding: '12px 24px',
+                    fontSize: '16px',
+                    background: difficulty === key ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                    border: '2px solid white',
+                    borderRadius: '25px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: difficulty === key ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {config.label} ({config.pairs} pairs)
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={initializeGame}
             style={{
