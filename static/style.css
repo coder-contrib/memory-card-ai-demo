@@ -1,0 +1,215 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.header h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header p {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 30px;
+    font-size: 24px;
+    color: white;
+    font-weight: bold;
+}
+
+/* Start screen */
+.start-screen {
+    text-align: center;
+}
+
+.start-btn {
+    padding: 20px 40px;
+    font-size: 24px;
+    background: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #667eea;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.start-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Game board */
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Cards */
+.card {
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    user-select: none;
+}
+
+.card:hover:not(.matched):not(.flipped) {
+    transform: scale(1.05);
+}
+
+.card.flipped,
+.card.matched {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    cursor: default;
+}
+
+.card.matched {
+    opacity: 0.6;
+}
+
+/* Reset button */
+.reset-btn {
+    margin-top: 30px;
+    padding: 12px 30px;
+    font-size: 18px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+    background: white;
+    color: #667eea;
+}
+
+/* Win modal */
+.win-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.win-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.win-content h2 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #667eea;
+}
+
+.win-content p {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.play-again-btn {
+    padding: 15px 40px;
+    font-size: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.play-again-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+    .header h1 {
+        font-size: 32px;
+    }
+    
+    .card {
+        width: 70px;
+        height: 70px;
+        font-size: 32px;
+    }
+    
+    .game-board {
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .stats {
+        font-size: 18px;
+        gap: 20px;
+    }
+}

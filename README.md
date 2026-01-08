@@ -1,73 +1,91 @@
-Memory Card Game - AI Agent Workshop
+# Memory Card Game - AI Agent Workshop
 
-A fun, interactive memory card matching game built with React. Perfect for learning how to work with AI coding agents through GitHub issues!
-🎮 Game Features
+A fun, interactive memory card matching game built with **Python/Flask**. Perfect for learning how to work with AI coding agents through GitHub issues!
 
-    Match Pairs: Flip cards to find matching emoji pairs
-    Move Counter: Track how many moves you take
-    Win Detection: Celebration modal when you complete the game
-    Responsive Design: Beautiful gradient UI that works on all screens
-    Smooth Animations: Hover effects and transitions
+## 🎮 Game Features
 
-🚀 Quick Start
-Prerequisites
+- **Match Pairs**: Flip cards to find matching emoji pairs
+- **Move Counter**: Track how many moves you take
+- **Win Detection**: Celebration modal when you complete the game
+- **Responsive Design**: Beautiful gradient UI that works on all screens
+- **Smooth Animations**: Hover effects and transitions
 
-    Node.js (v14 or higher)
-    npm or yarn
-    Git
+## 🚀 Quick Start
 
-Installation
+### Prerequisites
 
-    Clone the repository:
+- Python 3.8 or higher
+- pip (Python package installer)
+- Git
 
-bash
+### Installation
 
+1. Clone the repository:
+
+```bash
 git clone https://github.com/yourusername/memory-card-game.git
 cd memory-card-game
+```
 
-    Install dependencies:
+2. Create and activate a virtual environment (recommended):
 
-bash
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-npm install
+3. Install dependencies:
 
-    Start the development server:
+```bash
+pip install -r requirements.txt
+```
 
-bash
+4. Start the development server:
 
-npm run dev
+```bash
+python app.py
+```
 
-    Open your browser to http://localhost:5173
+5. Open your browser to http://localhost:5000
 
-Vite Configuration
+### Configuration
 
-For cloud development environments, update your vite.config.js:
-javascript
+You can configure the application using environment variables:
 
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+```bash
+# Change the port (default: 5000)
+export PORT=3000
 
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: true,
-    port: 5173,
-    strictPort: false,
-    allowedHosts: 'all', // For development only!
-  }
-})
+# Disable debug mode (default: true)
+export FLASK_DEBUG=false
 
-📁 Project Structure
+# Set a secret key for sessions (recommended for production)
+export SECRET_KEY=your-secret-key-here
+```
 
+## 📁 Project Structure
+
+```
 memory-card-game/
-├── src/
-│   ├── App.jsx           # Main game component
-│   ├── main.jsx          # Entry point
-│   └── index.css         # Global styles (optional)
-├── public/
-├── vite.config.js        # Vite configuration
-├── package.json
+├── app.py                # Flask application and game logic
+├── requirements.txt      # Python dependencies
+├── templates/
+│   └── index.html        # Main game template
+├── static/
+│   ├── style.css         # Game styles
+│   └── game.js           # Client-side JavaScript
 └── README.md
+```
+
+## 🔌 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Render the game page |
+| `/api/start` | POST | Start a new game |
+| `/api/state` | GET | Get current game state |
+| `/api/flip/<index>` | POST | Flip a card at index |
+| `/api/reset-flip` | POST | Reset flipped cards (after no match) |
 
 🎯 Workshop Guide
 
@@ -259,35 +277,36 @@ Beyond the issues above, participants can also explore:
     Add statistics dashboard
     Create mobile touch gestures
 
-🛠️ Development Commands
-bash
+## 🛠️ Development Commands
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-npm install
+pip install -r requirements.txt
 
 # Start development server
-npm run dev
+python app.py
 
-# Build for production
-npm run build
+# Run with custom port
+PORT=3000 python app.py
+```
 
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
-
-📚 Learning Objectives
+## 📚 Learning Objectives
 
 By working on this project, participants will learn:
 
-    React Fundamentals: State management, hooks, component lifecycle
-    Event Handling: Click events, timers, animations
-    CSS Styling: Flexbox, Grid, gradients, transitions
-    Data Structures: Arrays, objects, state manipulation
-    Local Storage: Persisting data in the browser
-    AI Collaboration: Working with AI coding assistants
-    Git Workflow: Branching, PRs, code review
+- **Flask Fundamentals**: Routes, templates, sessions, JSON APIs
+- **Python**: Data structures, functions, state management
+- **JavaScript**: DOM manipulation, fetch API, async/await
+- **CSS Styling**: Flexbox, Grid, gradients, transitions
+- **Local Storage**: Persisting data in the browser
+- **AI Collaboration**: Working with AI coding assistants
+- **Git Workflow**: Branching, PRs, code review
 
 🤖 Tips for Using AI Agents
 

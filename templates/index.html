@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <div class="header">
+            <h1>Memory Card Game</h1>
+            <p>Match all the pairs to win!</p>
+        </div>
+
+        <!-- Stats (shown when game started) -->
+        <div id="stats" class="stats hidden">
+            <div>Moves: <span id="moves">0</span></div>
+            <div>Matches: <span id="matches">0</span>/<span id="total-pairs">8</span></div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="start-screen">
+            <button id="start-btn" class="start-btn">Start Game</button>
+        </div>
+
+        <!-- Game Board -->
+        <div id="game-board" class="game-board hidden"></div>
+
+        <!-- Reset Button -->
+        <button id="reset-btn" class="reset-btn hidden">Reset Game</button>
+
+        <!-- Win Modal -->
+        <div id="win-modal" class="win-modal hidden">
+            <div class="win-content">
+                <h2>🎉 You Won! 🎉</h2>
+                <p>Completed in <span id="final-moves">0</span> moves!</p>
+                <button id="play-again-btn" class="play-again-btn">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+</body>
+</html>
