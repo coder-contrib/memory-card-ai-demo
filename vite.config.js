@@ -8,11 +8,6 @@ export default defineConfig({
     host: true, // Listen on all network interfaces
     port: 5173,
     strictPort: false,
-    allowedHosts: [
-      'localhost',
-      '.coder.com', // Allow all Coder.com subdomains
-      '.ai.coder.com', // Allow all ai.coder.com subdomains
-      '.coderdemo.io' // Allow all coderdemo.io subdomains
-    ]
+    allowedHosts: true
   }
 })
