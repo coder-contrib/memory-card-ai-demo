@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
+const THEMES = {
+  space: { name: 'Space', symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'] },
+  animals: { name: 'Animals', symbols: ['🐶', '🐱', '🐼', '🦊', '🦁', '🐸', '🐵', '🐰'] },
+  flags: { name: 'Flags', symbols: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺'] },
+};
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -7,9 +13,10 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [theme, setTheme] = useState('space');
 
   // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  const cardSymbols = THEMES[theme].symbols;
 
   // Initialize game
   const initializeGame = () => {
@@ -109,6 +116,28 @@ const MemoryGame = () => {
         }}>
           Match all the pairs to win!
         </p>
+        {/* Theme Selector */}
+        <div style={{ marginTop: '15px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          {Object.entries(THEMES).map(([key, { name }]) => (
+            <button
+              key={key}
+              onClick={() => { setTheme(key); if (gameStarted) initializeGame(); }}
+              style={{
+                padding: '8px 16px',
+                fontSize: '14px',
+                background: theme === key ? 'white' : 'rgba(255,255,255,0.2)',
+                color: theme === key ? '#667eea' : 'white',
+                border: '2px solid white',
+                borderRadius: '20px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Stats */}
