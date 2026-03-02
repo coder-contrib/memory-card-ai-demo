@@ -1,17 +1,73 @@
+/**
+ * @fileoverview Memory Card Game - A React-based card matching game.
+ *
+ * This game presents players with a 4x4 grid of face-down cards.
+ * Players flip two cards at a time, trying to find matching pairs.
+ * The game tracks moves and displays a win modal upon completion.
+ *
+ * @module MemoryGame
+ */
+
 import React, { useState, useEffect } from 'react';
 
+/**
+ * @typedef {Object} Card
+ * @property {number} id - Unique identifier for the card
+ * @property {string} symbol - Emoji symbol displayed on the card
+ * @property {boolean} isFlipped - Whether the card is currently flipped
+ * @property {boolean} isMatched - Whether the card has been matched
+ */
+
+/**
+ * MemoryGame Component
+ *
+ * A complete memory card matching game with the following features:
+ * - 8 pairs of space-themed emoji cards (16 cards total)
+ * - Click-to-flip interaction with match detection
+ * - Move counter and match progress display
+ * - Win detection with celebration modal
+ * - Reset/restart functionality
+ *
+ * @component
+ * @returns {JSX.Element} The rendered memory game interface
+ */
 const MemoryGame = () => {
+  /** @type {[Card[], Function]} Array of card objects */
   const [cards, setCards] = useState([]);
+
+  /** @type {[number[], Function]} Indices of currently flipped (face-up) cards */
   const [flippedIndices, setFlippedIndices] = useState([]);
+
+  /** @type {[string[], Function]} Symbols that have been successfully matched */
   const [matchedPairs, setMatchedPairs] = useState([]);
+
+  /** @type {[number, Function]} Total number of moves (pairs of flips) made */
   const [moves, setMoves] = useState(0);
+
+  /** @type {[boolean, Function]} Whether the game has been started */
   const [gameStarted, setGameStarted] = useState(false);
+
+  /** @type {[boolean, Function]} Whether all pairs have been matched */
   const [gameWon, setGameWon] = useState(false);
 
-  // Card emojis for the game
+  /** @type {[boolean, Function]} Whether the timer ran out */
+  const [gameLost, setGameLost] = useState(false);
+
+  /** @type {[number, Function]} Countdown timer in seconds */
+  const [timeLeft, setTimeLeft] = useState(60);
+
+  /** @constant {string[]} Space-themed emoji symbols used for card pairs */
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
 
-  // Initialize game
+  /**
+   * Initializes or resets the game state.
+   *
+   * Creates a shuffled deck by duplicating symbols (to create pairs),
+   * randomizing their order, and resetting all game state variables.
+   *
+   * @function
+   * @returns {void}
+   */
   const initializeGame = () => {
     const shuffledCards = [...cardSymbols, ...cardSymbols]
       .sort(() => Math.random() - 0.5)
@@ -21,18 +77,35 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setGameLost(false);
+    setTimeLeft(60);
   };
 
-  // Handle card click
+  /**
+   * Handles card click events and game logic.
+   *
+   * Validates the click (ignores if game not started, already won, two cards
+   * already flipped, same card clicked, or card already matched). On valid
+   * click, flips the card and checks for matches when two cards are face-up.
+   *
+   * Match behavior:
+   * - Match found: Cards stay face-up, pair added to matchedPairs
+   * - No match: Cards flip back after 1 second delay
+   * - Win condition: Triggers win modal after 500ms when all pairs matched
+   *
+   * @function
+   * @param {number} index - The index of the clicked card in the cards array
+   * @returns {void}
+   */
   const handleCardClick = (index) => {
-    if (!gameStarted || gameWon) return;
+    if (!gameStarted || gameWon || gameLost) return;
     if (flippedIndices.length === 2) return;
     if (flippedIndices.includes(index)) return;
     if (matchedPairs.includes(cards[index].symbol)) return;
@@ -43,12 +116,12 @@ const MemoryGame = () => {
     if (newFlippedIndices.length === 2) {
       setMoves(moves + 1);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
           setTimeout(() => setGameWon(true), 500);
@@ -62,16 +135,48 @@ const MemoryGame = () => {
     }
   };
 
-  // Check if card should be shown
+  /**
+   * Determines if a card's symbol should be visible (face-up).
+   *
+   * A card is visible if it's currently flipped or has been matched.
+   *
+   * @function
+   * @param {number} index - The index of the card in the cards array
+   * @param {string} symbol - The emoji symbol of the card
+   * @returns {boolean} True if the card should display its symbol
+   */
   const isCardVisible = (index, symbol) => {
     return flippedIndices.includes(index) || matchedPairs.includes(symbol);
   };
 
+  /**
+   * Effect: Sets up global body styles on component mount.
+   * Removes default margins/padding and enables auto overflow.
+   */
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
   }, []);
+
+  /**
+   * Effect: Countdown timer that decrements every second.
+   * When timer reaches 0, triggers game loss.
+   */
+  useEffect(() => {
+    if (!gameStarted || gameWon || gameLost) return;
+
+    if (timeLeft <= 0) {
+      setGameLost(true);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameStarted, gameWon, gameLost, timeLeft]);
 
   return (
     <div style={{
@@ -80,7 +185,7 @@ const MemoryGame = () => {
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: '#000000',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -121,6 +226,7 @@ const MemoryGame = () => {
           color: 'white',
           fontWeight: 'bold'
         }}>
+          <div>Time: {timeLeft}s</div>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
         </div>
@@ -232,6 +338,68 @@ const MemoryGame = () => {
         >
           Reset Game
         </button>
+      )}
+
+      {/* Lose Modal */}
+      {gameLost && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '40px',
+            borderRadius: '20px',
+            textAlign: 'center',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              fontSize: '48px',
+              margin: '0 0 20px 0',
+              color: '#e74c3c'
+            }}>
+              Time's Up!
+            </h2>
+            <p style={{
+              fontSize: '24px',
+              margin: '0 0 30px 0',
+              color: '#333'
+            }}>
+              You didn't complete the game in time.
+            </p>
+            <button
+              onClick={initializeGame}
+              style={{
+                padding: '15px 40px',
+                fontSize: '20px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: 'white',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Win Modal */}
