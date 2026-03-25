@@ -8,7 +8,7 @@ const MemoryGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
 
-  // Card emojis for the game
+  // Card emojis for the game - dummy PR change
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
 
   // Initialize game
