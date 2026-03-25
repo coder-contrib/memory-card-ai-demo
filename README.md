@@ -1,6 +1,8 @@
 Memory Card Game - AI Agent Workshop
 
 A fun, interactive memory card matching game built with React. Perfect for learning how to work with AI coding agents through GitHub issues!
+
+<!-- Dummy change for PR demonstration -->
 🎮 Game Features
 
     Match Pairs: Flip cards to find matching emoji pairs
