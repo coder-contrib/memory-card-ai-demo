@@ -1,6 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const MemoryGame = () => {
+  // Audio context for sound effects
+  const playFlipSound = useCallback(() => {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.15);
+  }, []);
+
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
   const [matchedPairs, setMatchedPairs] = useState([]);
@@ -36,6 +55,9 @@ const MemoryGame = () => {
     if (flippedIndices.length === 2) return;
     if (flippedIndices.includes(index)) return;
     if (matchedPairs.includes(cards[index].symbol)) return;
+
+    // Play flip sound
+    playFlipSound();
 
     const newFlippedIndices = [...flippedIndices, index];
     setFlippedIndices(newFlippedIndices);
