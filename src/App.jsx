@@ -7,9 +7,33 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [theme, setTheme] = useState('space'); // space, animals, food, sports
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Theme configurations
+  const themes = {
+    space: {
+      name: 'Space',
+      symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'],
+      icon: '🚀'
+    },
+    animals: {
+      name: 'Animals',
+      symbols: ['🦁', '🐯', '🐻', '🐼', '🐨', '🦊', '🐰', '🐸'],
+      icon: '🦁'
+    },
+    food: {
+      name: 'Food',
+      symbols: ['🍎', '🍊', '🍋', '🍇', '🍓', '🍑', '🥝', '🍒'],
+      icon: '🍎'
+    },
+    sports: {
+      name: 'Sports',
+      symbols: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏓', '🎱'],
+      icon: '⚽'
+    }
+  };
+
+  const cardSymbols = themes[theme].symbols;
 
   // Initialize game
   const initializeGame = () => {
@@ -21,7 +45,7 @@ const MemoryGame = () => {
         isFlipped: false,
         isMatched: false
       }));
-    
+
     setCards(shuffledCards);
     setFlippedIndices([]);
     setMatchedPairs([]);
@@ -43,12 +67,12 @@ const MemoryGame = () => {
     if (newFlippedIndices.length === 2) {
       setMoves(moves + 1);
       const [firstIndex, secondIndex] = newFlippedIndices;
-      
+
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
         // Match found
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
+
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
           setTimeout(() => setGameWon(true), 500);
@@ -145,7 +169,7 @@ const MemoryGame = () => {
               style={{
                 width: '100px',
                 height: '100px',
-                background: isCardVisible(index, card.symbol) 
+                background: isCardVisible(index, card.symbol)
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
                 borderRadius: '15px',
@@ -177,6 +201,50 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          {/* Theme Selector */}
+          <div style={{
+            marginBottom: '30px'
+          }}>
+            <p style={{
+              color: 'white',
+              fontSize: '18px',
+              marginBottom: '15px',
+              fontWeight: 'bold'
+            }}>
+              Choose a Theme:
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '15px',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              {Object.entries(themes).map(([key, { name, icon }]) => (
+                <button
+                  key={key}
+                  onClick={() => setTheme(key)}
+                  style={{
+                    padding: '15px 25px',
+                    fontSize: '18px',
+                    background: theme === key ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                    border: '2px solid white',
+                    borderRadius: '25px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: theme === key ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <span style={{ fontSize: '24px' }}>{icon}</span>
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             onClick={initializeGame}
             style={{
