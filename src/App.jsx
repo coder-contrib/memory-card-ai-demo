@@ -1,5 +1,24 @@
 import React, { useState, useEffect } from 'react';
 
+// Theme definitions
+const themes = {
+  space: {
+    name: 'Space',
+    icon: '🚀',
+    symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌']
+  },
+  animals: {
+    name: 'Animals',
+    icon: '🐶',
+    symbols: ['🐶', '🐱', '🐼', '🦁', '🐸', '🦋', '🐢', '🦊']
+  },
+  flags: {
+    name: 'Flags',
+    icon: '🏁',
+    symbols: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺']
+  }
+};
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -7,9 +26,10 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState('space');
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Get current theme symbols
+  const cardSymbols = themes[selectedTheme].symbols;
 
   // Initialize game
   const initializeGame = () => {
@@ -177,6 +197,64 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          {/* Theme Selector */}
+          <div style={{
+            marginBottom: '30px'
+          }}>
+            <p style={{
+              color: 'white',
+              fontSize: '20px',
+              marginBottom: '15px',
+              fontWeight: 'bold'
+            }}>
+              Choose a Theme:
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '15px',
+              justifyContent: 'center'
+            }}>
+              {Object.entries(themes).map(([key, theme]) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedTheme(key)}
+                  style={{
+                    padding: '15px 25px',
+                    fontSize: '18px',
+                    background: selectedTheme === key
+                      ? 'white'
+                      : 'rgba(255, 255, 255, 0.2)',
+                    border: selectedTheme === key
+                      ? '3px solid #667eea'
+                      : '2px solid white',
+                    borderRadius: '15px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: selectedTheme === key ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedTheme !== key) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedTheme !== key) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                    }
+                  }}
+                >
+                  <span style={{ fontSize: '32px' }}>{theme.icon}</span>
+                  <span>{theme.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <button
             onClick={initializeGame}
             style={{
