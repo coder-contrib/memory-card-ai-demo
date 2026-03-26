@@ -7,9 +7,18 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [gridSize, setGridSize] = useState(4);
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // All available card emojis
+  const allSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌', '🔥', '💎', '🎯', '🎪', '🎨', '🎭', '🎪', '🌈', '⚡', '🦋'];
+
+  // Get symbols based on grid size
+  const getSymbolsForGrid = (size) => {
+    const pairsNeeded = (size * size) / 2;
+    return allSymbols.slice(0, pairsNeeded);
+  };
+
+  const cardSymbols = getSymbolsForGrid(gridSize);
 
   // Initialize game
   const initializeGame = () => {
@@ -130,7 +139,7 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
           gap: '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
@@ -143,8 +152,8 @@ const MemoryGame = () => {
               key={card.id}
               onClick={() => handleCardClick(index)}
               style={{
-                width: '100px',
-                height: '100px',
+                width: gridSize === 4 ? '100px' : gridSize === 6 ? '70px' : '55px',
+                height: gridSize === 4 ? '100px' : gridSize === 6 ? '70px' : '55px',
                 background: isCardVisible(index, card.symbol) 
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'white',
@@ -152,7 +161,7 @@ const MemoryGame = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '48px',
+                fontSize: gridSize === 4 ? '48px' : gridSize === 6 ? '32px' : '24px',
                 cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
                 transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
                 transition: 'all 0.3s ease',
@@ -177,6 +186,34 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          {/* Difficulty Selector */}
+          <div style={{
+            marginBottom: '30px',
+            color: 'white'
+          }}>
+            <p style={{ fontSize: '20px', marginBottom: '15px' }}>Select Difficulty:</p>
+            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+              {[4, 6, 8].map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setGridSize(size)}
+                  style={{
+                    padding: '12px 24px',
+                    fontSize: '18px',
+                    background: gridSize === size ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                    border: '2px solid white',
+                    borderRadius: '25px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: gridSize === size ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {size}x{size}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={initializeGame}
             style={{
