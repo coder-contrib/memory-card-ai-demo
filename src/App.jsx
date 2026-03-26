@@ -98,6 +98,17 @@ const MemoryGame = () => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.style.overflow = 'auto';
+
+    // Add pulse animation for timer
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
   }, []);
 
   return (
@@ -146,12 +157,21 @@ const MemoryGame = () => {
           marginBottom: '30px',
           fontSize: '24px',
           color: 'white',
-          fontWeight: 'bold'
+          fontWeight: 'bold',
+          alignItems: 'center'
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
-          <div style={{ color: timeRemaining <= 10 ? '#ff6b6b' : 'white' }}>
-            Time: {timeRemaining}s
+          <div style={{
+            padding: '10px 20px',
+            borderRadius: '15px',
+            fontSize: '28px',
+            background: timeRemaining <= 10 ? 'rgba(231, 76, 60, 0.9)' : 'rgba(255, 255, 255, 0.2)',
+            color: 'white',
+            animation: timeRemaining <= 10 ? 'pulse 1s infinite' : 'none',
+            boxShadow: timeRemaining <= 10 ? '0 0 20px rgba(231, 76, 60, 0.5)' : 'none'
+          }}>
+            ⏱️ {timeRemaining}s
           </div>
         </div>
       )}
