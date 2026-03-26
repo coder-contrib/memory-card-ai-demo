@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
+const THEMES = {
+  emoji: { name: 'Emoji', symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'] },
+  animals: { name: 'Animals', symbols: ['🦁', '🐯', '🐻', '🐼', '🦊', '🐰', '🦄', '🐲'] },
+  flags: { name: 'Flags', symbols: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺'] }
+};
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -7,9 +13,10 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [theme, setTheme] = useState('emoji');
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Card symbols based on selected theme
+  const cardSymbols = THEMES[theme].symbols;
 
   // Initialize game
   const initializeGame = () => {
@@ -174,9 +181,34 @@ const MemoryGame = () => {
           ))}
         </div>
       ) : (
-        <div style={{
-          textAlign: 'center'
-        }}>
+        <div style={{ textAlign: 'center' }}>
+          {/* Theme Selector */}
+          <div style={{ marginBottom: '30px' }}>
+            <p style={{ color: 'white', fontSize: '20px', marginBottom: '15px' }}>
+              Select Theme:
+            </p>
+            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+              {Object.entries(THEMES).map(([key, { name, symbols }]) => (
+                <button
+                  key={key}
+                  onClick={() => setTheme(key)}
+                  style={{
+                    padding: '15px 25px',
+                    fontSize: '18px',
+                    background: theme === key ? 'white' : 'rgba(255,255,255,0.2)',
+                    border: '2px solid white',
+                    borderRadius: '25px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: theme === key ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {symbols[0]} {name}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={initializeGame}
             style={{
