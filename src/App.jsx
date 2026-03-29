@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const GAME_TIME = 60; // seconds
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -7,6 +9,8 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [gameLost, setGameLost] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(GAME_TIME);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -28,11 +32,41 @@ const MemoryGame = () => {
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setGameLost(false);
+    setTimeLeft(GAME_TIME);
   };
+
+  // Return to start screen
+  const returnToStart = () => {
+    setGameStarted(false);
+    setGameWon(false);
+    setGameLost(false);
+    setTimeLeft(GAME_TIME);
+    setCards([]);
+    setFlippedIndices([]);
+    setMatchedPairs([]);
+    setMoves(0);
+  };
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (!gameStarted || gameWon || gameLost) return;
+
+    if (timeLeft <= 0) {
+      setGameLost(true);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameStarted, gameWon, gameLost, timeLeft]);
 
   // Handle card click
   const handleCardClick = (index) => {
-    if (!gameStarted || gameWon) return;
+    if (!gameStarted || gameWon || gameLost) return;
     if (flippedIndices.length === 2) return;
     if (flippedIndices.includes(index)) return;
     if (matchedPairs.includes(cards[index].symbol)) return;
@@ -121,6 +155,9 @@ const MemoryGame = () => {
           color: 'white',
           fontWeight: 'bold'
         }}>
+          <div style={{ color: timeLeft <= 10 ? '#ff6b6b' : 'white' }}>
+            Time: {timeLeft}s
+          </div>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
         </div>
@@ -267,7 +304,7 @@ const MemoryGame = () => {
               margin: '0 0 30px 0',
               color: '#333'
             }}>
-              Completed in {moves} moves!
+              Completed in {moves} moves with {timeLeft}s left!
             </p>
             <button
               onClick={initializeGame}
@@ -292,6 +329,93 @@ const MemoryGame = () => {
             >
               Play Again
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Lose Modal - Time's Up */}
+      {gameLost && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '40px',
+            borderRadius: '20px',
+            textAlign: 'center',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              fontSize: '48px',
+              margin: '0 0 20px 0',
+              color: '#e53e3e'
+            }}>
+              ⏰ Time's Up! ⏰
+            </h2>
+            <p style={{
+              fontSize: '24px',
+              margin: '0 0 30px 0',
+              color: '#333'
+            }}>
+              You matched {matchedPairs.length}/{cardSymbols.length} pairs
+            </p>
+            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+              <button
+                onClick={initializeGame}
+                style={{
+                  padding: '15px 40px',
+                  fontSize: '20px',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: 'none',
+                  borderRadius: '50px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  color: 'white',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                Try Again
+              </button>
+              <button
+                onClick={returnToStart}
+                style={{
+                  padding: '15px 40px',
+                  fontSize: '20px',
+                  background: 'white',
+                  border: '2px solid #667eea',
+                  borderRadius: '50px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  color: '#667eea',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                Main Menu
+              </button>
+            </div>
           </div>
         </div>
       )}
