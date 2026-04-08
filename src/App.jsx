@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
+/**
+ * MemoryGame Component
+ *
+ * A memory card matching game where players flip cards to find matching pairs.
+ * Features include move tracking, best score persistence, and total games counter.
+ *
+ * Game State:
+ * - Cards are shuffled at the start of each game
+ * - Players flip two cards per turn to find matches
+ * - Game ends when all pairs are matched
+ * - Best score and games played are persisted in localStorage
+ *
+ * @returns {JSX.Element} The rendered memory game component
+ */
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -16,10 +30,14 @@ const MemoryGame = () => {
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  // Card emojis for the game
+  /** Array of emoji symbols used as card faces - each appears twice in the game */
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
 
-  // Initialize game
+  /**
+   * Initializes or resets the game state.
+   * Creates a shuffled deck of cards with each symbol appearing twice.
+   * Resets move counter, matched pairs, and flipped cards.
+   */
   const initializeGame = () => {
     const shuffledCards = [...cardSymbols, ...cardSymbols]
       .sort(() => Math.random() - 0.5)
@@ -38,7 +56,13 @@ const MemoryGame = () => {
     setGameWon(false);
   };
 
-  // Handle card click
+  /**
+   * Handles card click events.
+   * Manages the card flipping logic, match detection, and win condition.
+   * Updates best score and games played when a game is won.
+   *
+   * @param {number} index - The index of the clicked card in the cards array
+   */
   const handleCardClick = (index) => {
     if (!gameStarted || gameWon) return;
     if (flippedIndices.length === 2) return;
@@ -53,26 +77,27 @@ const MemoryGame = () => {
       const [firstIndex, secondIndex] = newFlippedIndices;
       
       if (cards[firstIndex].symbol === cards[secondIndex].symbol) {
-        // Match found
+        // Match found - add symbol to matched pairs and clear flipped state
         setMatchedPairs([...matchedPairs, cards[firstIndex].symbol]);
         setFlippedIndices([]);
-        
-        // Check if game is won
+
+        // Check if all pairs have been matched (game won)
         if (matchedPairs.length + 1 === cardSymbols.length) {
           const finalMoves = moves + 1;
-          // Update best score
+          // Update best score if this is a new record (lower is better)
           if (bestScore === null || finalMoves < bestScore) {
             setBestScore(finalMoves);
             localStorage.setItem('memoryGame_bestScore', finalMoves.toString());
           }
-          // Update games played
+          // Increment and persist games played counter
           const newGamesPlayed = gamesPlayed + 1;
           setGamesPlayed(newGamesPlayed);
           localStorage.setItem('memoryGame_gamesPlayed', newGamesPlayed.toString());
+          // Delay win modal to allow final match animation
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
-        // No match, flip back after delay
+        // No match - flip cards back after 1 second delay for player to memorize
         setTimeout(() => {
           setFlippedIndices([]);
         }, 1000);
@@ -80,11 +105,22 @@ const MemoryGame = () => {
     }
   };
 
-  // Check if card should be shown
+  /**
+   * Determines if a card's face should be visible.
+   * A card is visible if it's currently flipped or has been matched.
+   *
+   * @param {number} index - The index of the card in the cards array
+   * @param {string} symbol - The emoji symbol on the card
+   * @returns {boolean} True if the card face should be shown
+   */
   const isCardVisible = (index, symbol) => {
     return flippedIndices.includes(index) || matchedPairs.includes(symbol);
   };
 
+  /**
+   * Effect to reset body styles on component mount.
+   * Ensures the game fills the viewport properly.
+   */
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
