@@ -1,23 +1,44 @@
 import React, { useState, useEffect } from 'react';
 
+/**
+ * THEMES - Configuration object containing all available card themes
+ * Each theme has a display name and an array of 8 emoji symbols for matching pairs
+ * @type {Object.<string, {name: string, symbols: string[]}>}
+ */
 const THEMES = {
   emoji: { name: 'Emoji', symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'] },
   animals: { name: 'Animals', symbols: ['🐶', '🐱', '🐼', '🦊', '🦁', '🐸', '🐵', '🐰'] },
   flags: { name: 'Flags', symbols: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇨🇦', '🇦🇺'] }
 };
 
+/**
+ * MemoryGame - Main component for the memory card matching game
+ * Renders a 4x4 grid of cards that players flip to find matching pairs
+ * @returns {JSX.Element} The complete game UI
+ */
 const MemoryGame = () => {
+  /** @type {Array<{id: number, symbol: string, isFlipped: boolean, isMatched: boolean}>} */
   const [cards, setCards] = useState([]);
+  /** @type {number[]} Indices of currently flipped cards (max 2) */
   const [flippedIndices, setFlippedIndices] = useState([]);
+  /** @type {string[]} Symbols of successfully matched pairs */
   const [matchedPairs, setMatchedPairs] = useState([]);
+  /** @type {number} Total number of moves made */
   const [moves, setMoves] = useState(0);
+  /** @type {boolean} Whether the game has started */
   const [gameStarted, setGameStarted] = useState(false);
+  /** @type {boolean} Whether the player has won */
   const [gameWon, setGameWon] = useState(false);
+  /** @type {string} Currently selected theme key */
   const [selectedTheme, setSelectedTheme] = useState('emoji');
 
+  /** Array of emoji symbols for the current theme */
   const cardSymbols = THEMES[selectedTheme].symbols;
 
-  // Initialize game
+  /**
+   * initializeGame - Resets and shuffles the game board
+   * Creates 16 cards (8 pairs) and randomizes their positions
+   */
   const initializeGame = () => {
     const shuffledCards = [...cardSymbols, ...cardSymbols]
       .sort(() => Math.random() - 0.5)
@@ -36,7 +57,11 @@ const MemoryGame = () => {
     setGameWon(false);
   };
 
-  // Handle card click
+  /**
+   * handleCardClick - Processes card flip logic and match detection
+   * Handles game rules: max 2 cards flipped, match checking, win condition
+   * @param {number} index - The index of the clicked card
+   */
   const handleCardClick = (index) => {
     if (!gameStarted || gameWon) return;
     if (flippedIndices.length === 2) return;
@@ -68,11 +93,21 @@ const MemoryGame = () => {
     }
   };
 
-  // Check if card should be shown
+  /**
+   * isCardVisible - Determines if a card's symbol should be displayed
+   * Returns true if the card is currently flipped or has been matched
+   * @param {number} index - Card index
+   * @param {string} symbol - Card symbol
+   * @returns {boolean} Whether the card face is visible
+   */
   const isCardVisible = (index, symbol) => {
     return flippedIndices.includes(index) || matchedPairs.includes(symbol);
   };
 
+  /**
+   * useEffect hook - Initializes document body styles on component mount
+   * Removes default margins/padding for fullscreen game layout
+   */
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
