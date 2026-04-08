@@ -7,6 +7,14 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [bestScore, setBestScore] = useState(() => {
+    const saved = localStorage.getItem('memoryGame_bestScore');
+    return saved ? parseInt(saved, 10) : null;
+  });
+  const [gamesPlayed, setGamesPlayed] = useState(() => {
+    const saved = localStorage.getItem('memoryGame_gamesPlayed');
+    return saved ? parseInt(saved, 10) : 0;
+  });
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -51,6 +59,16 @@ const MemoryGame = () => {
         
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
+          const finalMoves = moves + 1;
+          // Update best score
+          if (bestScore === null || finalMoves < bestScore) {
+            setBestScore(finalMoves);
+            localStorage.setItem('memoryGame_bestScore', finalMoves.toString());
+          }
+          // Update games played
+          const newGamesPlayed = gamesPlayed + 1;
+          setGamesPlayed(newGamesPlayed);
+          localStorage.setItem('memoryGame_gamesPlayed', newGamesPlayed.toString());
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -112,19 +130,25 @@ const MemoryGame = () => {
       </div>
 
       {/* Stats */}
-      {gameStarted && (
-        <div style={{
-          display: 'flex',
-          gap: '30px',
-          marginBottom: '30px',
-          fontSize: '24px',
-          color: 'white',
-          fontWeight: 'bold'
-        }}>
-          <div>Moves: {moves}</div>
-          <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
-        </div>
-      )}
+      <div style={{
+        display: 'flex',
+        gap: '30px',
+        marginBottom: '30px',
+        fontSize: '20px',
+        color: 'white',
+        fontWeight: 'bold',
+        flexWrap: 'wrap',
+        justifyContent: 'center'
+      }}>
+        {gameStarted && (
+          <>
+            <div>Moves: {moves}</div>
+            <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          </>
+        )}
+        <div style={{ opacity: 0.8 }}>Best: {bestScore !== null ? bestScore : '-'}</div>
+        <div style={{ opacity: 0.8 }}>Games: {gamesPlayed}</div>
+      </div>
 
       {/* Game Board */}
       {gameStarted ? (
@@ -264,10 +288,17 @@ const MemoryGame = () => {
             </h2>
             <p style={{
               fontSize: '24px',
-              margin: '0 0 30px 0',
+              margin: '0 0 10px 0',
               color: '#333'
             }}>
               Completed in {moves} moves!
+            </p>
+            <p style={{
+              fontSize: '18px',
+              margin: '0 0 30px 0',
+              color: '#666'
+            }}>
+              Best Score: {bestScore} moves | Total Games: {gamesPlayed}
             </p>
             <button
               onClick={initializeGame}
