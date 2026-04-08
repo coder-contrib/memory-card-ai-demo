@@ -1,17 +1,39 @@
 import React, { useState, useEffect } from 'react';
 
+/**
+ * MemoryGame - A classic memory card matching game component.
+ * Players flip cards to find matching pairs of emoji symbols.
+ * The game tracks moves and displays a win modal upon completion.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered memory game interface
+ */
 const MemoryGame = () => {
+  /** @type {Array<{id: number, symbol: string, isFlipped: boolean, isMatched: boolean}>} */
   const [cards, setCards] = useState([]);
+
+  /** @type {number[]} Indices of currently flipped cards (max 2) */
   const [flippedIndices, setFlippedIndices] = useState([]);
+
+  /** @type {string[]} Symbols of successfully matched pairs */
   const [matchedPairs, setMatchedPairs] = useState([]);
+
+  /** @type {number} Total number of moves (pair attempts) made */
   const [moves, setMoves] = useState(0);
+
+  /** @type {boolean} Whether the game has been started */
   const [gameStarted, setGameStarted] = useState(false);
+
+  /** @type {boolean} Whether all pairs have been matched */
   const [gameWon, setGameWon] = useState(false);
 
-  // Card emojis for the game
+  /** Space-themed emoji symbols used for card pairs */
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
 
-  // Initialize game
+  /**
+   * Initializes or resets the game state.
+   * Creates shuffled pairs of cards and resets all game counters.
+   */
   const initializeGame = () => {
     const shuffledCards = [...cardSymbols, ...cardSymbols]
       .sort(() => Math.random() - 0.5)
@@ -30,7 +52,12 @@ const MemoryGame = () => {
     setGameWon(false);
   };
 
-  // Handle card click
+  /**
+   * Handles card click events for the memory game.
+   * Manages card flipping logic, match detection, and win condition.
+   *
+   * @param {number} index - The index of the clicked card in the cards array
+   */
   const handleCardClick = (index) => {
     if (!gameStarted || gameWon) return;
     if (flippedIndices.length === 2) return;
@@ -62,11 +89,22 @@ const MemoryGame = () => {
     }
   };
 
-  // Check if card should be shown
+  /**
+   * Determines if a card's symbol should be visible.
+   * A card is visible if it's currently flipped or has been matched.
+   *
+   * @param {number} index - The index of the card in the cards array
+   * @param {string} symbol - The emoji symbol of the card
+   * @returns {boolean} True if the card face should be shown
+   */
   const isCardVisible = (index, symbol) => {
     return flippedIndices.includes(index) || matchedPairs.includes(symbol);
   };
 
+  /**
+   * Effect hook to reset body styles on component mount.
+   * Ensures full-screen display without unwanted margins or scrollbars.
+   */
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
