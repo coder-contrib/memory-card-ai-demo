@@ -6,11 +6,17 @@ permissions:
 on:
   issue_comment:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      issue-url:
+        description: 'GitHub issue URL to process'
+        required: true
+        type: string
 
 jobs:
   trigger-on-comment:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.comment.body, '@coder-contrib-bot')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.comment.body, '@coder-contrib-bot')
     steps:
       - name: Coder Create Agent Chat
         uses: coder/create-agent-chat-action@main
@@ -18,8 +24,8 @@ jobs:
           coder-url: ${{ secrets.CODER_URL }}
           coder-token: ${{ secrets.CODER_TOKEN }}
           coder-organization: "coder"
-          chat-prompt: "Spin up a workspace from the 'memorycard' template in the 'coder' organization using the latest template version. Then use the gh CLI to read ${{ github.event.issue.html_url }}, write an appropriate plan for solving the issue to PLAN.md, and then wait for feedback."
+          chat-prompt: "Spin up a workspace from the 'memorycard' template in the 'coder' organization using the latest template version. Then use the gh CLI to read ${{ github.event.inputs.issue-url || github.event.issue.html_url }}, write an appropriate plan for solving the issue to PLAN.md, and then wait for feedback."
           github-user-id: ${{ github.event.sender.id }}
-          github-issue-url: ${{ github.event.issue.html_url }}
+          github-issue-url: ${{ github.event.inputs.issue-url || github.event.issue.html_url }}
           github-token: ${{ github.token }}
           comment-on-issue: true
