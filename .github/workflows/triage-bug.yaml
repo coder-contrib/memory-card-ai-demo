@@ -1,4 +1,4 @@
-name: Start Coder Task
+name: Start Coder Agent Chat
 
 permissions:
   issues: write
@@ -6,21 +6,20 @@ permissions:
 on:
   issue_comment:
     types: [created]
+  workflow_dispatch:
 
 jobs:
   trigger-on-comment:
     runs-on: ubuntu-latest
-    if: startsWith(github.event.comment.body, '@coder-contrib-bot')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.comment.body, '@coder-contrib-bot')
     steps:
-      - name: Coder Create Task
-        uses: coder/create-task-action@v0.0.4
+      - name: Coder Create Agent Chat
+        uses: coder/create-agent-chat-action@main
         with:
           coder-url: ${{ secrets.CODER_URL }}
           coder-token: ${{ secrets.CODER_TOKEN }}
           coder-organization: "coder"
-          coder-template-name: "memorycard"
-          coder-task-name-prefix: "gh-task"
-          coder-task-prompt: "Use the gh CLI to read ${{ github.event.issue.html_url }}, write an appropriate plan for solving the issue to PLAN.md, and then wait for feedback."
+          chat-prompt: "Spin up a workspace from the 'memorycard' template in the 'coder' organization using the latest template version. Then use the gh CLI to read ${{ github.event.issue.html_url }}, write an appropriate plan for solving the issue to PLAN.md, and then wait for feedback."
           github-user-id: ${{ github.event.sender.id }}
           github-issue-url: ${{ github.event.issue.html_url }}
           github-token: ${{ github.token }}
