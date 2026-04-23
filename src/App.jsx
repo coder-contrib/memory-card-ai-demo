@@ -7,9 +7,19 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [difficulty, setDifficulty] = useState(4); // 4x4, 6x6, or 8x8
 
-  // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  // Card emojis for the game (32 symbols for 8x8 grid)
+  const allSymbols = [
+    '🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌',
+    '🎮', '🎯', '🎨', '🎭', '🎪', '🎢', '🎡', '🎠',
+    '🦁', '🐯', '🐻', '🐼', '🦊', '🐰', '🦄', '🐲',
+    '🍎', '🍊', '🍋', '🍇', '🍓', '🍒', '🥝', '🍑'
+  ];
+
+  // Get symbols based on difficulty (pairs needed = grid^2 / 2)
+  const pairsNeeded = (difficulty * difficulty) / 2;
+  const cardSymbols = allSymbols.slice(0, pairsNeeded);
 
   // Initialize game
   const initializeGame = () => {
@@ -130,53 +140,82 @@ const MemoryGame = () => {
       {gameStarted ? (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '15px',
+          gridTemplateColumns: `repeat(${difficulty}, 1fr)`,
+          gap: difficulty === 8 ? '8px' : difficulty === 6 ? '10px' : '15px',
           padding: '20px',
           background: 'rgba(255, 255, 255, 0.1)',
           borderRadius: '20px',
           backdropFilter: 'blur(10px)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
         }}>
-          {cards.map((card, index) => (
-            <div
-              key={card.id}
-              onClick={() => handleCardClick(index)}
-              style={{
-                width: '100px',
-                height: '100px',
-                background: isCardVisible(index, card.symbol) 
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : 'white',
-                borderRadius: '15px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '48px',
-                cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
-                transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
-                transition: 'all 0.3s ease',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
-                userSelect: 'none',
-                opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
-              }}
-            >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
-            </div>
-          ))}
+          {cards.map((card, index) => {
+            const cardSize = difficulty === 8 ? 60 : difficulty === 6 ? 75 : 100;
+            const fontSize = difficulty === 8 ? 28 : difficulty === 6 ? 36 : 48;
+            return (
+              <div
+                key={card.id}
+                onClick={() => handleCardClick(index)}
+                style={{
+                  width: `${cardSize}px`,
+                  height: `${cardSize}px`,
+                  background: isCardVisible(index, card.symbol)
+                    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                    : 'white',
+                  borderRadius: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: `${fontSize}px`,
+                  cursor: matchedPairs.includes(card.symbol) ? 'default' : 'pointer',
+                  transform: isCardVisible(index, card.symbol) ? 'scale(1)' : 'scale(1)',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                  userSelect: 'none',
+                  opacity: matchedPairs.includes(card.symbol) ? 0.6 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (!matchedPairs.includes(card.symbol) && !isCardVisible(index, card.symbol)) {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              </div>
+            );
+          })}
         </div>
       ) : (
-        <div style={{
-          textAlign: 'center'
-        }}>
+        <div style={{ textAlign: 'center' }}>
+          {/* Difficulty Selector */}
+          <div style={{ marginBottom: '30px' }}>
+            <p style={{ color: 'white', fontSize: '20px', marginBottom: '15px' }}>
+              Select Difficulty:
+            </p>
+            <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
+              {[4, 6, 8].map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setDifficulty(size)}
+                  style={{
+                    padding: '15px 25px',
+                    fontSize: '18px',
+                    background: difficulty === size ? 'white' : 'rgba(255,255,255,0.2)',
+                    border: '2px solid white',
+                    borderRadius: '25px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: difficulty === size ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {size}x{size}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={initializeGame}
             style={{
