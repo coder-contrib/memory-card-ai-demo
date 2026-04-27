@@ -169,7 +169,22 @@ const MemoryGame = () => {
                 e.currentTarget.style.transform = 'scale(1)';
               }}
             >
-              {isCardVisible(index, card.symbol) ? card.symbol : '?'}
+              {isCardVisible(index, card.symbol) ? card.symbol : (
+                <svg
+                  width="50"
+                  height="50"
+                  viewBox="0 0 100 100"
+                  xmlns="http://www.w3.org/2000/svg"
+                  style={{ filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.15))' }}
+                >
+                  <polygon
+                    points="50,5 95,50 50,95 5,50"
+                    fill="#e53e3e"
+                    stroke="#c53030"
+                    strokeWidth="2"
+                  />
+                </svg>
+              )}
             </div>
           ))}
         </div>
