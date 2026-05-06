@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
@@ -7,6 +7,9 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [gameLost, setGameLost] = useState(false);
+  const timerRef = useRef(null);
 
   // Card emojis for the game
   const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
@@ -28,11 +31,48 @@ const MemoryGame = () => {
     setMoves(0);
     setGameStarted(true);
     setGameWon(false);
+    setGameLost(false);
+    setTimeLeft(60);
   };
+
+  // Return to start screen
+  const returnToStart = () => {
+    clearInterval(timerRef.current);
+    setGameStarted(false);
+    setGameWon(false);
+    setGameLost(false);
+    setTimeLeft(60);
+    setCards([]);
+    setFlippedIndices([]);
+    setMatchedPairs([]);
+    setMoves(0);
+  };
+
+  // Countdown timer
+  useEffect(() => {
+    if (gameStarted && !gameWon && !gameLost) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            setGameLost(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [gameStarted, gameWon, gameLost]);
 
   // Handle card click
   const handleCardClick = (index) => {
-    if (!gameStarted || gameWon) return;
+    if (!gameStarted || gameWon || gameLost) return;
     if (flippedIndices.length === 2) return;
     if (flippedIndices.includes(index)) return;
     if (matchedPairs.includes(cards[index].symbol)) return;
@@ -51,6 +91,7 @@ const MemoryGame = () => {
         
         // Check if game is won
         if (matchedPairs.length + 1 === cardSymbols.length) {
+          clearInterval(timerRef.current);
           setTimeout(() => setGameWon(true), 500);
         }
       } else {
@@ -123,6 +164,12 @@ const MemoryGame = () => {
         }}>
           <div>Moves: {moves}</div>
           <div>Matches: {matchedPairs.length}/{cardSymbols.length}</div>
+          <div style={{
+            color: timeLeft <= 10 ? '#ff6b6b' : 'white',
+            animation: timeLeft <= 10 ? 'pulse 1s infinite' : 'none'
+          }}>
+            ⏱️ {timeLeft}s
+          </div>
         </div>
       )}
 
@@ -267,7 +314,7 @@ const MemoryGame = () => {
               margin: '0 0 30px 0',
               color: '#333'
             }}>
-              Completed in {moves} moves!
+              Completed in {moves} moves with {timeLeft}s remaining!
             </p>
             <button
               onClick={initializeGame}
@@ -291,6 +338,75 @@ const MemoryGame = () => {
               }}
             >
               Play Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Lose Modal */}
+      {gameLost && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'white',
+            padding: '40px',
+            borderRadius: '20px',
+            textAlign: 'center',
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <h2 style={{
+              fontSize: '48px',
+              margin: '0 0 20px 0',
+              color: '#e74c3c'
+            }}>
+              ⏰ Time's Up! ⏰
+            </h2>
+            <p style={{
+              fontSize: '24px',
+              margin: '0 0 30px 0',
+              color: '#333'
+            }}>
+              You didn't complete the game in time!
+            </p>
+            <p style={{
+              fontSize: '18px',
+              margin: '0 0 30px 0',
+              color: '#666'
+            }}>
+              You matched {matchedPairs.length}/{cardSymbols.length} pairs in {moves} moves.
+            </p>
+            <button
+              onClick={returnToStart}
+              style={{
+                padding: '15px 40px',
+                fontSize: '20px',
+                background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                color: 'white',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              Back to Start
             </button>
           </div>
         </div>
