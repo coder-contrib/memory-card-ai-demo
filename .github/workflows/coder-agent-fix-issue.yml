@@ -1,0 +1,378 @@
+name: "Coder Agent — Fix Issue"
+
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number for the agent to work on"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  # One run per issue at a time; cancel any in-flight run for the same issue.
+  group: coder-agent-issue-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: true
+
+jobs:
+  # Gate: only run when an authorized user posts the trigger command on an open issue
+  # (or when the workflow is manually dispatched).
+  gate:
+    name: Check trigger
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      issue_number: ${{ steps.check.outputs.issue_number }}
+      triggering_user: ${{ steps.check.outputs.triggering_user }}
+      triggering_user_id: ${{ steps.check.outputs.triggering_user_id }}
+    steps:
+      - id: check
+        name: Validate trigger
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual dispatch by '${{ github.actor }}' for issue #${{ inputs.issue_number }}"
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "issue_number=${{ inputs.issue_number }}" >> "$GITHUB_OUTPUT"
+            echo "triggering_user=${{ github.actor }}" >> "$GITHUB_OUTPUT"
+            echo "triggering_user_id=${{ github.event.sender.id }}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # issue_comment event guards
+          if [[ "${{ github.event.issue.pull_request != null }}" == "true" ]]; then
+            echo "Comment is on a PR, not an issue. Skipping."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          COMMENT_BODY="${{ github.event.comment.body }}"
+          if [[ ! "$COMMENT_BODY" =~ (^|[[:space:]])/coder-fix($|[[:space:]]) ]]; then
+            echo "Comment does not contain '/coder-fix'. Skipping."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "${{ github.event.issue.state }}" != "open" ]]; then
+            echo "Issue #${{ github.event.issue.number }} is not open. Skipping."
+            gh issue comment "${{ github.event.issue.number }}" --repo "$REPO" \
+              --body "⚠️ \`/coder-fix\` ignored — issue is not open."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Permission check: only users with write/maintain/admin may trigger.
+          ACTOR="${{ github.event.comment.user.login }}"
+          PERMISSION=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" --jq '.permission' 2>/dev/null || echo "none")
+          case "$PERMISSION" in
+            admin|maintain|write)
+              echo "User '$ACTOR' has '$PERMISSION' permission. Authorized."
+              ;;
+            *)
+              echo "User '$ACTOR' has '$PERMISSION' permission. Not authorized."
+              gh issue comment "${{ github.event.issue.number }}" --repo "$REPO" \
+                --body "⚠️ @$ACTOR — only users with write access can trigger \`/coder-fix\`."
+              echo "should_run=false" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+          esac
+
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+          echo "issue_number=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
+          echo "triggering_user=$ACTOR" >> "$GITHUB_OUTPUT"
+          echo "triggering_user_id=${{ github.event.comment.user.id }}" >> "$GITHUB_OUTPUT"
+
+  agent-fix:
+    name: Run agent on issue #${{ needs.gate.outputs.issue_number }}
+    needs: gate
+    if: needs.gate.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    env:
+      CODER_ORGANIZATION: ${{ vars.CODER_ORGANIZATION || 'experiment' }}
+      ISSUE_NUMBER: ${{ needs.gate.outputs.issue_number }}
+      BRANCH_NAME: coder-fix/issue-${{ needs.gate.outputs.issue_number }}-${{ github.run_id }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Post acknowledgement comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo "${{ github.repository }}" \
+            --body "🤖 Coder agent dispatched on this issue by @${{ needs.gate.outputs.triggering_user }}.
+          Working branch: \`$BRANCH_NAME\`
+          Follow progress: [workflow run]($WORKFLOW_URL)"
+
+      - name: Setup Coder CLI
+        uses: coder/setup-action@v1.1.0
+        with:
+          access_url: ${{ secrets.AI_CODER_COM_CODER_URL }}
+          coder_session_token: ${{ secrets.AI_CODER_COM_CODER_SESSION_TOKEN }}
+
+      - name: Get triggering user's email
+        id: get-email
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACTOR: ${{ needs.gate.outputs.triggering_user }}
+        shell: bash
+        run: |
+          EMAIL=$(gh api "users/$ACTOR" --jq '.email // empty' 2>/dev/null || true)
+          echo "email=${EMAIL:-}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate temporary Coder token for triggering user
+        id: generate-token
+        uses: ./.github/actions/generate-coder-token
+        with:
+          coder_url: ${{ secrets.AI_CODER_COM_CODER_URL }}
+          admin_token: ${{ secrets.AI_CODER_COM_CODER_SESSION_TOKEN }}
+          github_user_id: ${{ needs.gate.outputs.triggering_user_id }}
+          github_email: ${{ steps.get-email.outputs.email }}
+          run_id: ${{ github.run_id }}
+
+      - name: Fetch issue details
+        id: issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ISSUE_JSON=$(gh issue view "$ISSUE_NUMBER" --repo "${{ github.repository }}" \
+            --json title,body,labels,comments)
+
+          ISSUE_TITLE=$(echo "$ISSUE_JSON" | jq -r '.title')
+          ISSUE_BODY=$(echo "$ISSUE_JSON" | jq -r '.body // ""')
+          ISSUE_LABELS=$(echo "$ISSUE_JSON" | jq -r '[.labels[].name] | join(", ")')
+          ISSUE_COMMENTS=$(echo "$ISSUE_JSON" | jq -r \
+            '[.comments[] | "**@\(.author.login):** \(.body)"] | join("\n\n---\n\n")')
+
+          {
+            echo "title<<ISSUE_EOF"
+            echo "$ISSUE_TITLE"
+            echo "ISSUE_EOF"
+            echo "body<<ISSUE_EOF"
+            echo "$ISSUE_BODY"
+            echo "ISSUE_EOF"
+            echo "labels=$ISSUE_LABELS"
+            echo "comments<<ISSUE_EOF"
+            echo "$ISSUE_COMMENTS"
+            echo "ISSUE_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch Coder agent to fix issue
+        id: agent-fix
+        uses: coder/agents-chat-action@v0
+        with:
+          coder-url: ${{ secrets.AI_CODER_COM_CODER_URL }}
+          coder-token: ${{ steps.generate-token.outputs.coder_token }}
+          coder-organization: ${{ env.CODER_ORGANIZATION }}
+          chat-prompt: |
+            You are a coding agent working on an open-source workshop project. You have been
+            dispatched to resolve a single GitHub issue end-to-end: read the issue, implement
+            the change, run the project's checks, commit the result, and open a pull request.
+
+            REPOSITORY: ${{ github.repository }}
+            ISSUE NUMBER: #${{ env.ISSUE_NUMBER }}
+            ISSUE URL: ${{ github.server_url }}/${{ github.repository }}/issues/${{ env.ISSUE_NUMBER }}
+            BASE BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+            WORKING BRANCH: ${{ env.BRANCH_NAME }}
+
+            ISSUE TITLE:
+            ${{ steps.issue.outputs.title }}
+
+            ISSUE LABELS: ${{ steps.issue.outputs.labels }}
+
+            ISSUE BODY:
+            ${{ steps.issue.outputs.body }}
+
+            EXISTING COMMENTS (for additional context):
+            ${{ steps.issue.outputs.comments }}
+
+            CONSTRAINTS:
+            - Make the SMALLEST change that satisfies the acceptance criteria in the issue body.
+              Do not refactor unrelated code. Do not add unrelated features.
+            - Work on the branch `${{ env.BRANCH_NAME }}`. Do NOT push to `main` directly.
+            - Do NOT modify files under `.github/` unless the issue explicitly requires it.
+            - Do NOT add new top-level dependencies unless the issue requires it. If you do,
+              run `npm install` so `package-lock.json` is updated and committed.
+            - Run `npm install` (if needed) and `npm run lint` before committing. If lint
+              fails because of YOUR changes, fix them. If it fails for reasons unrelated to
+              your changes, note that in the PR body but proceed.
+            - Commits must be signed off with the message format:
+              `fix(#${{ env.ISSUE_NUMBER }}): <short description>`
+            - One commit is preferred. Squash if you made several exploratory commits.
+
+            STEPS:
+
+            1. EXPLORE: Read the repository structure (README.md, AGENTS.md, CLAUDE.md,
+               package.json, src/). Understand the existing code style before changing anything.
+
+            2. PLAN: In your first message, post a brief plan: which files you intend to touch,
+               and how you will verify the change locally.
+
+            3. IMPLEMENT: Check out branch `${{ env.BRANCH_NAME }}` from the default branch
+               and make the change.
+
+            4. VERIFY: Run `npm install` and `npm run lint`. If the repo has a build or test
+               command in package.json scripts, run them too. Capture the output.
+
+            5. COMMIT & PUSH: Commit using the conventional format above. Push the branch to
+               `origin`.
+
+            6. OPEN PR: Open a pull request from `${{ env.BRANCH_NAME }}` to
+               `${{ github.event.repository.default_branch || 'main' }}`. The PR body MUST:
+                 - Start with `Closes #${{ env.ISSUE_NUMBER }}`
+                 - Summarize the change in 2-4 sentences
+                 - List the files modified
+                 - Include the output of any commands you ran in a collapsed `<details>` block
+                 - End with the report block below
+
+            FORMATTING:
+            - Use Markdown in all messages: ## headings, bullet lists, ``` code blocks.
+            - Keep messages concise.
+
+            REPORT: Your final message MUST contain a report block in this exact format:
+
+            ---BEGIN REPORT---
+            STATUS: SUCCESS or FAILURE
+            STEP: <which step failed, or "ALL" if successful>
+            PR_URL: <URL of the opened PR, or "N/A" if none>
+            SUMMARY: <one-line description of the outcome>
+            ---END REPORT---
+          github-url: ${{ github.server_url }}/${{ github.repository }}/issues/${{ env.ISSUE_NUMBER }}
+          github-token: ${{ github.token }}
+          wait: complete
+          wait-timeout-seconds: "1800"
+          idempotency-key: issue-${{ env.ISSUE_NUMBER }}-${{ github.run_id }}
+          force-new-chat: "true"
+
+      - name: Check agent result
+        id: check-result
+        if: always() && steps.agent-fix.outputs.chat-id != ''
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHAT_ID="${{ steps.agent-fix.outputs.chat-id }}"
+          CHAT_STATUS="${{ steps.agent-fix.outputs.chat-status }}"
+          CHAT_URL="${{ steps.agent-fix.outputs.chat-url }}"
+
+          echo "chat_url=$CHAT_URL" >> "$GITHUB_OUTPUT"
+
+          if [[ "$CHAT_STATUS" == "error" ]]; then
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+            echo "step=INFRASTRUCTURE" >> "$GITHUB_OUTPUT"
+            echo "summary=Infrastructure error: ${{ steps.agent-fix.outputs.chat-error-message }}" >> "$GITHUB_OUTPUT"
+            echo "pr_url=N/A" >> "$GITHUB_OUTPUT"
+            echo "::error::Agent infra failed for issue #$ISSUE_NUMBER"
+            exit 0
+          fi
+
+          ALL_MESSAGES=$(curl -sf \
+            -H "Coder-Session-Token: ${{ steps.generate-token.outputs.coder_token }}" \
+            "${{ secrets.AI_CODER_COM_CODER_URL }}/api/experimental/chats/$CHAT_ID/messages" \
+            | jq -r '[.messages[] | select(.role == "assistant") | .content[] | select(.type == "text") | .text] | join("\n")')
+
+          REPORT=$(echo "$ALL_MESSAGES" | awk '/---BEGIN REPORT---/{found=1; next} /---END REPORT---/{found=0} found')
+
+          if [[ -z "$REPORT" ]]; then
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+            echo "step=UNKNOWN" >> "$GITHUB_OUTPUT"
+            echo "pr_url=N/A" >> "$GITHUB_OUTPUT"
+            echo "summary=Agent did not produce a structured report block." >> "$GITHUB_OUTPUT"
+            echo "::error::Agent did not report a structured RESULT for issue #$ISSUE_NUMBER"
+            exit 0
+          fi
+
+          REPORT_STATUS=$(echo "$REPORT" | grep '^STATUS:'  | sed 's/^STATUS: *//')
+          REPORT_STEP=$(echo "$REPORT"   | grep '^STEP:'    | sed 's/^STEP: *//')
+          REPORT_PR=$(echo "$REPORT"     | grep '^PR_URL:'  | sed 's/^PR_URL: *//')
+          REPORT_SUMMARY=$(echo "$REPORT" | grep '^SUMMARY:' | sed 's/^SUMMARY: *//')
+
+          echo "step=$REPORT_STEP" >> "$GITHUB_OUTPUT"
+          echo "summary=$REPORT_SUMMARY" >> "$GITHUB_OUTPUT"
+          echo "pr_url=$REPORT_PR" >> "$GITHUB_OUTPUT"
+
+          if [[ "$REPORT_STATUS" == "SUCCESS" ]]; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+            echo "::error::Agent reported FAILURE at step '$REPORT_STEP' for issue #$ISSUE_NUMBER: $REPORT_SUMMARY"
+          fi
+
+      - name: Post result to issue
+        if: always() && steps.check-result.outputs.result != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT: ${{ steps.check-result.outputs.result }}
+          STEP: ${{ steps.check-result.outputs.step }}
+          SUMMARY: ${{ steps.check-result.outputs.summary }}
+          PR_URL: ${{ steps.check-result.outputs.pr_url }}
+          CHAT_URL: ${{ steps.check-result.outputs.chat_url }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          if [[ "$RESULT" == "success" ]]; then
+            ICON="✅"
+            STATUS_TEXT="completed"
+          else
+            ICON="❌"
+            STATUS_TEXT="failed"
+          fi
+
+          BODY="${ICON} **Coder agent $STATUS_TEXT** on issue #$ISSUE_NUMBER
+
+          | Field | Value |
+          |-------|-------|
+          | **Step** | ${STEP} |
+          | **Summary** | ${SUMMARY} |
+          | **Pull Request** | ${PR_URL} |
+          | **Agent chat** | ${CHAT_URL} |
+          | **Workflow run** | [View logs](${WORKFLOW_URL}) |"
+
+          gh issue comment "$ISSUE_NUMBER" --repo "${{ github.repository }}" --body "$BODY"
+
+      - name: Archive agent chat
+        if: always() && steps.agent-fix.outputs.chat-id != ''
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHAT_ID="${{ steps.agent-fix.outputs.chat-id }}"
+          curl -sf -X PATCH \
+            -H "Coder-Session-Token: ${{ steps.generate-token.outputs.coder_token }}" \
+            -H "Content-Type: application/json" \
+            "${{ secrets.AI_CODER_COM_CODER_URL }}/api/experimental/chats/$CHAT_ID" \
+            -d '{"archived": true}'
+
+      - name: Delete agent workspace
+        if: always() && steps.agent-fix.outputs.workspace-id != ''
+        continue-on-error: true
+        env:
+          CODER_SESSION_TOKEN: ${{ steps.generate-token.outputs.coder_token }}
+          CODER_USER: ${{ steps.generate-token.outputs.coder_user }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          WORKSPACE_ID="${{ steps.agent-fix.outputs.workspace-id }}"
+          WORKSPACE_NAME=$(curl -sf \
+            -H "Coder-Session-Token: $CODER_SESSION_TOKEN" \
+            "${{ secrets.AI_CODER_COM_CODER_URL }}/api/v2/workspaces/$WORKSPACE_ID" \
+            | jq -r '.name')
+
+          echo "Deleting agent workspace ($CODER_USER/$WORKSPACE_NAME)"
+          coder delete -y "$CODER_USER/$WORKSPACE_NAME"
