@@ -99,7 +99,7 @@ jobs:
     if: needs.gate.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     env:
-      CODER_ORGANIZATION: ${{ vars.CODER_ORGANIZATION || 'experiment' }}
+      CODER_ORGANIZATION: ${{ vars.CODER_ORGANIZATION || 'Public demos' }}
       ISSUE_NUMBER: ${{ needs.gate.outputs.issue_number }}
       BRANCH_NAME: coder-fix/issue-${{ needs.gate.outputs.issue_number }}-${{ github.run_id }}
     steps:
