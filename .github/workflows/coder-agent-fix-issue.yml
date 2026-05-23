@@ -122,8 +122,8 @@ jobs:
       - name: Setup Coder CLI
         uses: coder/setup-action@v1.1.0
         with:
-          access_url: ${{ secrets.AI_CODER_COM_CODER_URL }}
-          coder_session_token: ${{ secrets.AI_CODER_COM_CODER_SESSION_TOKEN }}
+          access_url: ${{ secrets.CODER_URL }}
+          coder_session_token: ${{ secrets.CODER_TOKEN }}
 
       - name: Get triggering user's email
         id: get-email
@@ -139,8 +139,8 @@ jobs:
         id: generate-token
         uses: ./.github/actions/generate-coder-token
         with:
-          coder_url: ${{ secrets.AI_CODER_COM_CODER_URL }}
-          admin_token: ${{ secrets.AI_CODER_COM_CODER_SESSION_TOKEN }}
+          coder_url: ${{ secrets.CODER_URL }}
+          admin_token: ${{ secrets.CODER_TOKEN }}
           github_user_id: ${{ needs.gate.outputs.triggering_user_id }}
           github_email: ${{ steps.get-email.outputs.email }}
           run_id: ${{ github.run_id }}
@@ -178,7 +178,7 @@ jobs:
         id: agent-fix
         uses: coder/agents-chat-action@v0
         with:
-          coder-url: ${{ secrets.AI_CODER_COM_CODER_URL }}
+          coder-url: ${{ secrets.CODER_URL }}
           coder-token: ${{ steps.generate-token.outputs.coder_token }}
           coder-organization: ${{ env.CODER_ORGANIZATION }}
           chat-prompt: |
@@ -284,7 +284,7 @@ jobs:
 
           ALL_MESSAGES=$(curl -sf \
             -H "Coder-Session-Token: ${{ steps.generate-token.outputs.coder_token }}" \
-            "${{ secrets.AI_CODER_COM_CODER_URL }}/api/experimental/chats/$CHAT_ID/messages" \
+            "${{ secrets.CODER_URL }}/api/experimental/chats/$CHAT_ID/messages" \
             | jq -r '[.messages[] | select(.role == "assistant") | .content[] | select(.type == "text") | .text] | join("\n")')
 
           REPORT=$(echo "$ALL_MESSAGES" | awk '/---BEGIN REPORT---/{found=1; next} /---END REPORT---/{found=0} found')
@@ -356,7 +356,7 @@ jobs:
           curl -sf -X PATCH \
             -H "Coder-Session-Token: ${{ steps.generate-token.outputs.coder_token }}" \
             -H "Content-Type: application/json" \
-            "${{ secrets.AI_CODER_COM_CODER_URL }}/api/experimental/chats/$CHAT_ID" \
+            "${{ secrets.CODER_URL }}/api/experimental/chats/$CHAT_ID" \
             -d '{"archived": true}'
 
       - name: Delete agent workspace
@@ -371,7 +371,7 @@ jobs:
           WORKSPACE_ID="${{ steps.agent-fix.outputs.workspace-id }}"
           WORKSPACE_NAME=$(curl -sf \
             -H "Coder-Session-Token: $CODER_SESSION_TOKEN" \
-            "${{ secrets.AI_CODER_COM_CODER_URL }}/api/v2/workspaces/$WORKSPACE_ID" \
+            "${{ secrets.CODER_URL }}/api/v2/workspaces/$WORKSPACE_ID" \
             | jq -r '.name')
 
           echo "Deleting agent workspace ($CODER_USER/$WORKSPACE_NAME)"
