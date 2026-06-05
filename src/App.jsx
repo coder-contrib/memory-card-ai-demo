@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
+const themes = {
+  space: { label: '🚀 Space', symbols: ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'] },
+  animals: { label: '🐶 Animals', symbols: ['🐶', '🐱', '🐼', '🦊', '🐸', '🦁', '🐯', '🐨'] },
+  emoji: { label: '😀 Emoji', symbols: ['😀', '😎', '🥳', '😍', '🤩', '😂', '🤔', '😴'] },
+  flags: { label: '🏁 Flags', symbols: ['🇺🇸', '🇬🇧', '🇫🇷', '🇩🇪', '🇯🇵', '🇧🇷', '🇰🇷', '🇮🇹'] },
+};
+
 const MemoryGame = () => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState([]);
@@ -7,9 +14,10 @@ const MemoryGame = () => {
   const [moves, setMoves] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState('space');
 
   // Card emojis for the game
-  const cardSymbols = ['🚀', '🛸', '⭐', '🌙', '🪐', '☄️', '🌟', '🌌'];
+  const cardSymbols = themes[selectedTheme].symbols;
 
   // Initialize game
   const initializeGame = () => {
@@ -177,6 +185,45 @@ const MemoryGame = () => {
         <div style={{
           textAlign: 'center'
         }}>
+          {/* Theme Selector */}
+          <div style={{
+            marginBottom: '30px'
+          }}>
+            <p style={{
+              color: 'white',
+              fontSize: '20px',
+              marginBottom: '15px',
+              fontWeight: 'bold'
+            }}>
+              Choose a Theme
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center',
+              flexWrap: 'wrap'
+            }}>
+              {Object.entries(themes).map(([key, theme]) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedTheme(key)}
+                  style={{
+                    padding: '12px 20px',
+                    fontSize: '18px',
+                    background: selectedTheme === key ? 'white' : 'rgba(255, 255, 255, 0.2)',
+                    border: '2px solid white',
+                    borderRadius: '30px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    color: selectedTheme === key ? '#667eea' : 'white',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  {theme.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <button
             onClick={initializeGame}
             style={{
