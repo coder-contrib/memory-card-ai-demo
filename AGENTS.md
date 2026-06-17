@@ -87,7 +87,7 @@ By default, Vite runs on port 5173. You can change the port by either:
 import { defineConfig } from 'vite';
 export default defineConfig({
   server: {
-    port: 3000,
+    port: {port},
   },
 });
 ```
@@ -95,7 +95,7 @@ export default defineConfig({
 2. Using an environment variable:
 
 ```js
-export PORT=3000  # or set in .env file as VITE_PORT=3000
+export PORT={port}  # or set in .env file as VITE_PORT={port}
 npm run dev
 ```
 
