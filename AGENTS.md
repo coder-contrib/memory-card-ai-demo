@@ -22,7 +22,7 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 - Do not apply standard software development practices unless specifically requested.
 - NEVER push or merge directly into the default branch (e.g. main). ALWAYS create a separate branch and make a pull request for it.
 - Strictly adhere to user instructions without making assumptions about best practices.
-- Never change the defined port number of the applicatio unless explicitly told to do so.
+- Never change the defined port numberin vite.config.js of unless explicitly told to do so.
 - Violation of these rules is considered a critical failure. 
 
 ## Our relationship
